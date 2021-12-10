@@ -225,6 +225,22 @@ let ({ CD.isc = isconstant; cout = constantout; cin = constantin },constant),
   }
 ;;
 
+let _uinstancein, _isuinstance, _uinstanceout, uinstance =
+  let { CD.cin; isc; cout }, uinstance = CD.declare {
+    CD.name = "univ-instance";
+    doc = "Universes level instance for a universe-polymoprhic constant, the mono constant is for monomorphic constants";
+    pp = (fun fmt x ->
+      let s = Pp.string_of_ppcmds (Univ.Instance.pr Univ.Level.pr x) in
+      Format.fprintf fmt "«%s»" s);
+    compare = (fun x y ->
+      CArray.compare Univ.Level.compare (Univ.Instance.to_array x) (Univ.Instance.to_array y));
+    hash = Univ.Instance.hash;
+    hconsed = false;
+    constants = [];
+  } in
+  cin, isc, cout, uinstance
+;;
+
 let collect_term_variables ~depth t =
   let rec aux ~depth acc t =
     match E.look ~depth t with
@@ -300,6 +316,7 @@ module GRMap = U.Map.Make(GROrd)
 module GRSet = U.Set.Make(GROrd)
 
 let globalc  = E.Constants.declare_global_symbol "global"
+let pglobalc  = E.Constants.declare_global_symbol "pglobal"
 
 module GrefCache = Hashtbl.Make(struct
   type t = GlobRef.t
@@ -318,6 +335,13 @@ let in_elpi_gr ~depth s r =
     GrefCache.add cache r x;
     x
 
+let in_elpi_poly_gr ~depth s r i =
+  let open API.Conversion in
+  let s, t, gl1 = gref.embed ~depth s r in
+  let s, i, gl2 = uinstance.embed ~depth s i in
+  assert (gl1 = [] && gl2 = []);
+  E.mkApp pglobalc t [i] (* (pglobal (const <<toto>>) <<u1 u2>>) *)
+
 let in_coq_gref ~depth ~origin ~failsafe s t =
   try
     let s, t, gls = gref.API.Conversion.readback ~depth s t in
@@ -329,6 +353,22 @@ let in_coq_gref ~depth ~origin ~failsafe s t =
     else
       err Pp.(str "The term " ++ str(pp2string (P.term depth) origin) ++
         str " cannot be represented in Coq since its gref part is illformed")
+
+let in_coq_poly_gref ~depth ~origin ~failsafe s t i =
+  let open API.Conversion in
+  try
+    let s, t, gls1 = gref.readback ~depth s t in
+    let s, i, gls2 = uinstance.readback ~depth s i in
+    assert(gls1 = [] && gls2 = []);
+    s, t, i
+  with API.Conversion.TypeErr _ ->
+    if failsafe then
+      s, Coqlib.lib_ref "elpi.unknown_gref", Univ.Instance.empty
+    else
+      err Pp.(str "The term " ++ str(pp2string (P.term depth) origin) ++
+        str " cannot be represented in Coq since its gref or univ-instance part is illformed")
+        
+
 
 let mpin, ismp, mpout, modpath =
   let { CD.cin; isc; cout }, x = CD.declare {
