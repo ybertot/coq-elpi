@@ -115,6 +115,8 @@ val unspec2opt : 'a Elpi.Builtin.unspec -> 'a option
 val opt2unspec : 'a option -> 'a Elpi.Builtin.unspec
 
 val in_elpi_gr : depth:int -> State.t -> Names.GlobRef.t -> term
+val in_elpi_poly_gr : depth:int -> State.t -> Names.GlobRef.t -> term -> term
+val in_elpi_poly_gr_instance : depth:int -> State.t -> Names.GlobRef.t -> Univ.Instance.t -> term
 val in_elpi_sort : Sorts.t -> term
 val in_elpi_flex_sort : term -> term
 val in_elpi_prod : Name.t -> term -> term -> term

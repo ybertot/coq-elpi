@@ -225,7 +225,7 @@ let ({ CD.isc = isconstant; cout = constantout; cin = constantin },constant),
   }
 ;;
 
-let _uinstancein, _isuinstance, _uinstanceout, uinstance =
+let uinstancein, _isuinstance, _uinstanceout, uinstance =
   let { CD.cin; isc; cout }, uinstance = CD.declare {
     CD.name = "univ-instance";
     doc = "Universes level instance for a universe-polymoprhic constant, the mono constant is for monomorphic constants";
@@ -337,10 +337,15 @@ let in_elpi_gr ~depth s r =
 
 let in_elpi_poly_gr ~depth s r i =
   let open API.Conversion in
-  let s, t, gl1 = gref.embed ~depth s r in
-  let s, i, gl2 = uinstance.embed ~depth s i in
-  assert (gl1 = [] && gl2 = []);
+  let s, t, gl = gref.embed ~depth s r in
+  assert (gl = []);
   E.mkApp pglobalc t [i] (* (pglobal (const <<toto>>) <<u1 u2>>) *)
+
+let in_elpi_poly_gr_instance ~depth s r i =
+  let open API.Conversion in
+  let s, i, gl = uinstance.embed ~depth s i in
+  assert (gl = []);
+  in_elpi_poly_gr ~depth s r i
 
 let in_coq_gref ~depth ~origin ~failsafe s t =
   try
@@ -353,22 +358,6 @@ let in_coq_gref ~depth ~origin ~failsafe s t =
     else
       err Pp.(str "The term " ++ str(pp2string (P.term depth) origin) ++
         str " cannot be represented in Coq since its gref part is illformed")
-
-let in_coq_poly_gref ~depth ~origin ~failsafe s t i =
-  let open API.Conversion in
-  try
-    let s, t, gls1 = gref.readback ~depth s t in
-    let s, i, gls2 = uinstance.readback ~depth s i in
-    assert(gls1 = [] && gls2 = []);
-    s, t, i
-  with API.Conversion.TypeErr _ ->
-    if failsafe then
-      s, Coqlib.lib_ref "elpi.unknown_gref", Univ.Instance.empty
-    else
-      err Pp.(str "The term " ++ str(pp2string (P.term depth) origin) ++
-        str " cannot be represented in Coq since its gref or univ-instance part is illformed")
-        
-
 
 let mpin, ismp, mpout, modpath =
   let { CD.cin; isc; cout }, x = CD.declare {
@@ -729,6 +718,7 @@ let check_univ_inst univ_inst =
     nYI "HOAS universe polymorphism"
     
 let get_sigma s = (S.get engine s).sigma
+let update_sigma s f = (S.update engine s (fun e -> { e with sigma = f e.sigma }))
 let get_global_env s = (S.get engine s).global_env
 
 let declare_evc = E.Constants.declare_global_symbol "declare-evar"
@@ -1039,10 +1029,12 @@ let rec constr2lp coq_ctx ~calldepth ~depth state t =
          let state, hd = aux ~depth env state hd in
          let state, args = CArray.fold_left_map (aux ~depth env) state args in
          state, in_elpi_app ~depth hd args
-    | C.Const(c,i) ->
-         check_univ_inst (EC.EInstance.kind sigma i);
+    | C.Const(c,i) when Univ.Instance.is_empty (EC.EInstance.kind sigma i) ->
          let ref = G.ConstRef c in
          state, in_elpi_gr ~depth state ref
+    | C.Const(c,i) ->
+          let ref = G.ConstRef c in
+          state, in_elpi_poly_gr_instance ~depth state ref (EC.EInstance.kind sigma i)
     | C.Ind(ind,i) ->
          check_univ_inst (EC.EInstance.kind sigma i);
          state, in_elpi_gr ~depth state (G.IndRef ind)
@@ -1326,6 +1318,55 @@ let analyze_scope ~depth coq_ctx args =
    in
       aux E.Constants.Set.empty [] [] false true args
 
+module UIM = F.Map(struct
+  type t = Univ.Instance.t
+  let compare i1 i2 =
+    CArray.compare Univ.Level.compare (Univ.Instance.to_array i1) (Univ.Instance.to_array i2)
+  let show x = Pp.string_of_ppcmds @@ Univ.Instance.pr Univ.Level.pr x
+  let pp fmt x = Format.fprintf fmt "%a" Pp.pp_with (Univ.Instance.pr Univ.Level.pr x)
+end)
+    
+let uim = S.declare ~name:"coq-elpi:evar-univ-instance-map"
+  ~pp:UIM.pp ~init:(fun () -> UIM.empty) ~start:(fun x -> x)
+    
+let in_coq_poly_gref ~depth ~origin ~failsafe s t i =
+  let open API.Conversion in
+  let uinstance_readback s i t =
+    match E.look ~depth i with
+    | E.UnifVar (b, args) ->
+      let m = S.get uim s in
+      begin try
+        let u = UIM.host b m in
+        s, u, []
+      with Not_found ->
+        let u, ctx = UnivGen.fresh_global_instance (get_global_env s) t in
+        let s = update_sigma s (fun sigma -> Evd.merge_context_set UState.univ_rigid sigma ctx) in
+        let u =
+          match C.kind u with
+          | C.Const (_, u) -> u
+          | C.Ind (_, u) -> u
+          | C.Construct (_, u) -> u
+          | _ -> assert false
+        in
+        let s = S.update uim s (UIM.add b u) in
+        s, u, [API.Conversion.Unify (E.mkUnifVar b ~args s,uinstancein u)]
+      end
+    | _ -> uinstance.readback ~depth s i
+  in
+  try
+    let s, t, gls1 = gref.readback ~depth s t in
+    let s, i, gls2 = uinstance_readback s i t in
+    assert (gls1 = []);
+    s, t, i, gls2
+  with API.Conversion.TypeErr _ ->
+    if failsafe then
+      s, Coqlib.lib_ref "elpi.unknown_gref", Univ.Instance.empty, []
+    else
+      let open Pp in
+      err ?loc:None @@
+        str "The term " ++ str (pp2string (P.term depth) origin) ++
+        str " cannot be represented in Coq since its gref or univ-instance part is illformed"
+
 let rec of_elpi_ctx ~calldepth syntactic_constraints depth dbl2ctx state initial_coq_ctx =
 
   let aux coq_ctx depth state t =
@@ -1389,6 +1430,15 @@ and lp2constr ~calldepth syntactic_constraints coq_ctx ~depth state ?(on_ty=fals
      | G.ConstructRef x -> state, EC.mkConstruct x, []
      | G.IndRef x -> state, EC.mkInd x, []
      end
+  | E.App(c,d,[i]) when pglobalc == c ->
+    let state, gr, i, gls =
+      in_coq_poly_gref ~depth ~origin:t ~failsafe:coq_ctx.options.failsafe state d i in
+    begin match gr with
+    | G.VarRef x -> assert false (* TODO: nice error *)
+    | G.ConstRef x -> state, EC.mkConstU (x, EC.EInstance.make i), gls
+    | G.ConstructRef x -> state, EC.mkConstructU (x, EC.EInstance.make i), gls
+    | G.IndRef x -> state, EC.mkIndU (x, EC.EInstance.make i), gls
+    end
  (* binders *)
   | E.App(c,name,[s;t]) when lamc == c || prodc == c ->
       let name = in_coq_fresh_annot_name ~depth ~coq_ctx depth name in

@@ -75,6 +75,7 @@ type sort  universe -> term. % Prop, Type@{i}
 
 % constants: inductive types, inductive constructors, definitions
 type global gref -> term.
+type pglobal gref -> univ-instance -> term.
 
 % binders: to form functions, arities and local definitions
 type fun  name -> term -> (term -> term) -> term.         % fun x : t =>
@@ -801,6 +802,11 @@ kind universe type.
 type prop universe. % impredicative sort of propositions
 type sprop universe. % impredicative sort of propositions with definitional proof irrelevance
 type typ univ -> universe. % predicative sort of data (carries a level)
+
+% Universes level instance for a universe-polymoprhic constant, the mono
+% constant is for monomorphic constants
+typeabbrev univ-instance (ctype "univ-instance").
+
 
 % [coq.univ.print] prints the set of universe constraints
 external pred coq.univ.print .

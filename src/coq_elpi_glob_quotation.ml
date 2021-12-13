@@ -92,6 +92,40 @@ let rec gterm2lp ~depth state x =
       str"gterm2lp: depth=" ++ int depth ++
       str " term=" ++Printer.pr_glob_constr_env (get_global_env state) (get_sigma state) x);
   match (DAst.get x) (*.CAst.v*) with
+  | GRef(GlobRef.ConstRef p,_ul) when Structures.PrimitiveProjections.mem p ->
+      let p = Option.get @@ Structures.PrimitiveProjections.find_opt p in
+      let hd = in_elpi_gr ~depth state (GlobRef.ConstRef (Projection.Repr.constant p)) in
+      state, hd
+  | GRef(gr, ul) when Global.is_polymorphic gr ->
+    begin match ul with
+    | None ->
+      incr type_gen;
+      let state, s =
+        API.RawQuery.mk_Arg state ~name:(Printf.sprintf "univ_inst_%d" !type_gen) ~args:[]
+      in
+      state, in_elpi_poly_gr ~depth state gr s
+    | Some l -> 
+      let sort_name = function
+        | GSProp -> Univ.Level.sprop
+        | GProp -> Univ.Level.prop
+        | GSet -> Univ.Level.set
+        | GUniv u -> u
+        | GRawUniv u -> assert false (* TODO: nice error *)
+          (* (try Evd.add_global_univ sigma u with UGraph.AlreadyDeclared -> sigma), u *)
+        | GLocalUniv l -> assert false (* TODO: nice error *)
+          (* universe_level_name sigma l  *)
+      in
+      let glob_level = function
+        | UAnonymous {rigid} -> assert false (* TODO: nice error *)
+        | UNamed s -> sort_name s
+      in
+      let l' = List.map glob_level l in
+      if List.exists (fun l -> Univ.Level.is_prop l) l' then
+        CErrors.user_err
+          Pp.(str "Universe instances cannot contain Prop, polymorphic" ++
+              str " universe instances must be greater or equal to Set.");
+      state, in_elpi_poly_gr_instance ~depth state gr (Univ.Instance.of_array (Array.of_list l'))
+    end
   | GRef(gr,_ul) -> state, in_elpi_gr ~depth state gr
   | GVar(id) ->
       let ctx, _ = Option.default (upcast @@ mk_coq_context ~options:default_options state, []) (get_ctx state) in

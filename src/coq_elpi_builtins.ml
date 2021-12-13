@@ -1815,6 +1815,7 @@ denote the same x as before.|};
   MLData univ;
 
   MLData universe;
+  MLData uinstance;
 
   MLCode(Pred("coq.univ.print",
     Read(unit_ctx,  "prints the set of universe constraints"),

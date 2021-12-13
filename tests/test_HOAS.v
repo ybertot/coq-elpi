@@ -301,3 +301,21 @@ Elpi Query lp:{{
   coq.locate "nat" {{:gref lib:elpi.test.nat }}.
 
 }}.
+
+Polymorphic Definition toto (T1 T2 : Type) (x : T1) := x.
+Polymorphic Definition titi := toto.
+
+Elpi Query lp:{{
+  coq.locate "titi" (const C),
+  coq.env.const C Body Term,
+  coq.say Body,
+  coq.say Term.
+}}.
+
+Universes u1 u2.
+
+Elpi Query lp:{{
+  coq.say {{ toto }},         % pglobal (const «toto») X
+  coq.say {{ toto@{u1 u2} }}, % pglobal (const «toto») «u1 u2»
+  coq.say {coq.term->string {{ toto }}}.
+}}.
