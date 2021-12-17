@@ -319,3 +319,12 @@ Elpi Query lp:{{
   coq.say {{ toto@{u1 u2} }}, % pglobal (const «toto») «u1 u2»
   coq.say {coq.term->string {{ toto }}}.
 }}.
+
+Record F (T : Type) := { t : T }.
+Definition fnat : F nat := {| t := 0 |}.
+
+Elpi Query lp:{{
+  coq.typecheck {{ @t nat fnat }} T D,
+  coq.say D,
+  D = ok.
+}}.

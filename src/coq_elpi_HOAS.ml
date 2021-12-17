@@ -713,10 +713,6 @@ let in_elpi_flex_sort t = E.mkApp sortc (E.mkApp typc t []) []
 
 (* {{{ HOAS : EConstr.t -> elpi ******************************************* *)
 
-let check_univ_inst univ_inst =
-  if not (Univ.Instance.is_empty univ_inst) then
-    nYI "HOAS universe polymorphism"
-    
 let get_sigma s = (S.get engine s).sigma
 let update_sigma s f = (S.update engine s (fun e -> { e with sigma = f e.sigma }))
 let get_global_env s = (S.get engine s).global_env
@@ -1035,12 +1031,16 @@ let rec constr2lp coq_ctx ~calldepth ~depth state t =
     | C.Const(c,i) ->
           let ref = G.ConstRef c in
           state, in_elpi_poly_gr_instance ~depth state ref (EC.EInstance.kind sigma i)
-    | C.Ind(ind,i) ->
-         check_univ_inst (EC.EInstance.kind sigma i);
+    | C.Ind (ind, i) when Univ.Instance.is_empty (EC.EInstance.kind sigma i) ->
          state, in_elpi_gr ~depth state (G.IndRef ind)
-    | C.Construct(construct,i) ->
-         check_univ_inst (EC.EInstance.kind sigma i);
-         state, in_elpi_gr ~depth state (G.ConstructRef construct)
+    | C.Ind (ind, i) ->
+         state, in_elpi_poly_gr_instance ~depth state (G.IndRef ind) (EC.EInstance.kind sigma i)
+    | C.Construct (construct, i) when Univ.Instance.is_empty (EC.EInstance.kind sigma i) ->
+         let ref = G.ConstructRef construct in
+         state, in_elpi_poly_gr_instance ~depth state ref (EC.EInstance.kind sigma i)
+    | C.Construct (construct, i) ->
+         let ref = G.ConstructRef construct in
+         state, in_elpi_gr ~depth state ref
     | C.Case(ci, u, pms, rt, iv, t, bs) ->
          let (_, rt, _, t, bs) = EConstr.expand_case env sigma (ci, u, pms, rt, iv, t, bs) in
          let state, t = aux ~depth env state t in
