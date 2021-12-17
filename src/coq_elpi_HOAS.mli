@@ -27,6 +27,7 @@ type options = {
   pplevel : Constrexpr.entry_relative_level;
   using : string option;
   inline : Declaremods.inline;
+  uinstance : Univ.Instance.t option;
 }
 
 type 'a coq_context = {
@@ -211,6 +212,7 @@ val pop_env : State.t -> State.t
 
 val get_global_env : State.t -> Environ.env
 val get_sigma : State.t -> Evd.evar_map
+val update_sigma : State.t -> (Evd.evar_map -> Evd.evar_map) -> State.t
 
 type hyp = { ctx_entry : term; depth : int }
 

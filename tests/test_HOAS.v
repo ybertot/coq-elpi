@@ -329,3 +329,12 @@ Elpi Query lp:{{
   coq.typecheck T Ty D,
   coq.say T.
 }}.
+
+Elpi Query lp:{{
+  coq.locate "F" GR,
+  coq.typecheck (pglobal GR I) Ty ok,
+  GR = indt Ind,
+  @uinstance! I => coq.env.indt Ind _ N _ Arity K KTys.
+
+}}.
+

@@ -110,8 +110,6 @@ let lookup_inductive env i =
   let mind, indbo = Inductive.lookup_mind_specif env i in
   if Array.length mind.Declarations.mind_packets <> 1 then
     nYI "API(env) mutual inductive";
-  if Declareops.inductive_is_polymorphic mind then
-    nYI "API(env) poly mutual inductive";
   mind, indbo
 
 

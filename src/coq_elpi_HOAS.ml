@@ -83,6 +83,7 @@ type options = {
   pplevel : Constrexpr.entry_relative_level;
   using : string option;
   inline : Declaremods.inline;
+  uinstance : Univ.Instance.t option;
 }
 
 let default_options = {
@@ -96,6 +97,7 @@ let default_options = {
   pplevel = Constrexpr.LevelSome;
   using = None;
   inline = Declaremods.NoInline;
+  uinstance = None;
 }
 
 type 'a coq_context = {
@@ -837,6 +839,14 @@ let get_options ~depth hyps state =
       let _, b, _ = Elpi.Builtin.(pair (unspec fst) (unspec snd)).API.Conversion.readback ~depth state t in
       Some b
     with Not_found -> None in
+  (* TODO: support writing *)
+  let get_uinstance_option name =
+    try
+      let t, depth = API.Data.StrMap.find name map in
+      let _, b, gl = uinstance.Elpi.API.Conversion.readback ~depth state t in
+      assert(gl = []);
+      Some b
+    with Not_found -> None in
   let empty2none = function Some "" -> None | x -> x in
   let deprecation = function
     | None -> None
@@ -859,6 +869,7 @@ let get_options ~depth hyps state =
     pplevel = pplevel @@ get_int_option "coq:pplevel";
     using = get_string_option "coq:using";
     inline = get_module_inline_option "coq:inline";
+    uinstance = get_uinstance_option "coq:uinstance";
   }
 
 let mk_coq_context ~options state =

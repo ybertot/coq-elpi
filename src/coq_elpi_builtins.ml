@@ -1223,22 +1223,35 @@ It's a fatal error if Name cannot be located.|})),
     Out(list constructor, "list of constructor names",
     COut(!>> B.list closed_ground_term, "list of the types of the constructors (type of KNames) including parameters",
     Full(global, "reads the inductive type declaration for the environment")))))))),
-  (fun i _ _ _ arity knames ktypes ~depth { env } _ state ->
+  (fun i _ _ _ arity knames ktypes ~depth { env ; options } _ state ->
      let open Declarations in
      let mind, indbo as ind = lookup_inductive env i in
      let co  = mind.mind_finite <> Declarations.CoFinite in
      let lno = mind.mind_nparams in
      let luno = mind.mind_nparams_rec in
+
+    (* TODO: avoid allocating new instance even if:
+        - no type is demanded
+        - instance given explicitly via @uinstance! *)
+     let uinst, state (* extra_goal *) =
+       match options.uinstance with
+       | None ->
+          let term, ctx = UnivGen.fresh_global_instance (get_global_env state) (GlobRef.IndRef i) in
+          snd @@ Constr.destInd term,
+          update_sigma state (fun sigma -> Evd.merge_context_set UState.univ_flexible_alg sigma ctx)
+       | Some i ->
+          i, state in
+
      let arity = if_keep arity (fun () ->
-       Inductive.type_of_inductive (ind,Univ.Instance.empty)
+       Inductive.type_of_inductive (ind,uinst)
        |> EConstr.of_constr) in
      let knames = if_keep knames (fun () ->
        CList.(init Declarations.(indbo.mind_nb_constant + indbo.mind_nb_args)
            (fun k -> i,k+1))) in
      let ktypes = if_keep ktypes (fun () ->
-       Inductive.type_of_constructors (i,Univ.Instance.empty) ind
+       Inductive.type_of_constructors (i,uinst) ind
        |> CArray.map_to_list EConstr.of_constr) in
-     state, !: co +! lno +! luno +? arity +? knames +? ktypes, [])),
+     state, !: co +! lno +! luno +? arity +? knames +? ktypes, [(*extra_goal*)])),
   DocNext);
 
   MLCode(Pred("coq.env.indt-decl",

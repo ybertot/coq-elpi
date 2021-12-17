@@ -338,6 +338,8 @@ macro @local!    :- get-option "coq:locality" "local".
 
 macro @primitive! :- get-option "coq:primitive" tt. % primitive records
 
+macro @uinstance! I :- get-option "coq:uinstance" I. % universe instance
+
 macro @ppwidth! N :- get-option "coq:ppwidth" N. % printing width
 macro @ppall! :- get-option "coq:pp" "all". % printing all
 macro @ppmost! :- get-option "coq:pp" "most". % printing most of contents
