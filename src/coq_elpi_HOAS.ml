@@ -1037,10 +1037,10 @@ let rec constr2lp coq_ctx ~calldepth ~depth state t =
          state, in_elpi_poly_gr_instance ~depth state (G.IndRef ind) (EC.EInstance.kind sigma i)
     | C.Construct (construct, i) when Univ.Instance.is_empty (EC.EInstance.kind sigma i) ->
          let ref = G.ConstructRef construct in
-         state, in_elpi_poly_gr_instance ~depth state ref (EC.EInstance.kind sigma i)
+         state, in_elpi_gr ~depth state ref
     | C.Construct (construct, i) ->
          let ref = G.ConstructRef construct in
-         state, in_elpi_gr ~depth state ref
+         state, in_elpi_poly_gr_instance ~depth state ref (EC.EInstance.kind sigma i)
     | C.Case(ci, u, pms, rt, iv, t, bs) ->
          let (_, rt, _, t, bs) = EConstr.expand_case env sigma (ci, u, pms, rt, iv, t, bs) in
          let state, t = aux ~depth env state t in
