@@ -320,11 +320,12 @@ Elpi Query lp:{{
   coq.say {coq.term->string {{ toto }}}.
 }}.
 
-Record F (T : Type) := { t : T }.
-Definition fnat : F nat := {| t := 0 |}.
+Polymorphic Record F (T : Type) := { t : T }.
+Polymorphic Definition fnat : F nat := {| t := 0%nat |}.
 
 Elpi Query lp:{{
-  coq.typecheck {{ @t nat fnat }} T D,
-  coq.say D,
-  D = ok.
+  T = {{ @t nat fnat }},
+  coq.say T,
+  coq.typecheck T Ty D,
+  coq.say T,
 }}.

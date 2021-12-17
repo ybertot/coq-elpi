@@ -1340,7 +1340,7 @@ let in_coq_poly_gref ~depth ~origin ~failsafe s t i =
         s, u, []
       with Not_found ->
         let u, ctx = UnivGen.fresh_global_instance (get_global_env s) t in
-        let s = update_sigma s (fun sigma -> Evd.merge_context_set UState.univ_rigid sigma ctx) in
+        let s = update_sigma s (fun sigma -> Evd.merge_context_set UState.univ_flexible_alg sigma ctx) in
         let u =
           match C.kind u with
           | C.Const (_, u) -> u
