@@ -327,5 +327,5 @@ Elpi Query lp:{{
   T = {{ @t nat fnat }},
   coq.say T,
   coq.typecheck T Ty D,
-  coq.say T,
+  coq.say T.
 }}.
