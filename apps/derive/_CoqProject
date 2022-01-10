@@ -31,3 +31,4 @@ theories/derive/eqb_core_defs.v
 theories/derive/tag.v
 theories/derive/fields.v
 theories/derive/eqb.v
+theories/derive/eqbcorrect.v
