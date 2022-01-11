@@ -62,6 +62,9 @@ Requires Elpi 1.13.6 and Coq 8.15.
 - New `coq.option.set`
 - New `coq.option.available?`
 - New `coq.bind-ind-parameters`
+- Change load `coq.ltac.*` also in commands (and not just tactics) so that
+  commands can easily turn holes into goals and inhabit them calling regular
+  tactics. 
 
 ### APPS
 - New `locker` app providing `lock` and `mlock` commands
