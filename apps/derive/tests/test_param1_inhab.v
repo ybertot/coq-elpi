@@ -1,6 +1,6 @@
 From elpi.apps Require Import derive.param1_inhab.
 
-From elpi.apps Require Import test_derive_stdlib test_param1.
+From elpi.apps Require Import test_derive_stdlib test_param1 test_param1_functor.
 Import test_derive_stdlib.Coverage.
 Import test_param1.Coverage.
 
@@ -33,10 +33,44 @@ Elpi derive.param1.inhab is_pr_record.
 Fail Elpi derive.param1.inhab is_dep_record.
 Elpi derive.param1.inhab is_enum.
 
+Require Import ssreflect ssrfun ssrbool JMeq.
+
+Section S.
+Context (A:Type) (PA:A -> Type) (hP:full A PA).
+
+Lemma is_peano_Zero_inv (i : is_peano Zero): is_Zero = i.
+Proof.
+  have: forall n (i:is_peano n),  n = Zero -> JMeq is_Zero i.
+  + by move=> _ [].
+  + move=> /(_ Zero i erefl); apply /JMeq_eq.
+Qed.
+
+Lemma is_peano_Succ_inv (n:peano) (i : is_peano (Succ n)): {isn : is_peano n & is_Succ n isn = i}.
+Proof.
+  have: forall p (i:is_peano p),  p = Succ n -> { isn : is_peano n & JMeq (is_Succ n isn) i}.
+  + by move=> _ [] // p Pn [] ?; subst p; exists Pn.
+  + by move=> /(_ _ i erefl) [] isn hje; exists isn; apply /JMeq_eq.
+Qed.
+
+Fixpoint is_vect_witness (i:peano) (pi:is_peano i) (v:vect A i) : is_vect A PA i pi v := 
+  match v as v' in vect _ i0 return forall (pi0: is_peano i0), is_vect A PA i0 pi0 v' with 
+  | VNil _ => fun (pi0: is_peano Zero) =>
+     let v := VNil A in
+     @eq_rect (is_peano Zero) is_Zero (fun isp => is_vect A PA Zero isp v)
+             (is_VNil A PA) pi0 (is_peano_Zero_inv pi0)
+  | VCons _ a m v' => 
+    fun (pi0:is_peano (Succ m)) => 
+      let inj := is_peano_Succ_inv m pi0 in
+      let pm := projT1 inj in
+      let v := VCons A a m v' in
+      @eq_rect (is_peano (Succ m)) (is_Succ m pm) (fun isp => is_vect A PA (Succ m) isp v)
+          (is_VCons A PA a (hP a) m pm v' (is_vect_witness m pm v')) pi0 (projT2 inj)
+  end pi.
+End S.
+
 End Coverage.
 
 Import Coverage.
-
 
 Check is_empty_witness : full empty is_empty.
 Check is_unit_witness : full unit is_unit.
