@@ -364,9 +364,9 @@ Qed.
 
 End UseEqRect.
 
+Require Import Eqdep_dec.
 
 Module UseEqRect_SB.
-Require Import Eqdep_dec.
 
 Lemma sigma_bool_eqb_correct (sb:sigma_bool) : 
   eqb_correct_on sigma_bool_eqb sb.
@@ -407,6 +407,8 @@ subst b'.
 rewrite (@UIP_dec _ Bool.bool_dec _ _ hb hb').
 done.
 Qed.
+
+End UseEqRect_SB.
 
 
 
