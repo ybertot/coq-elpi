@@ -33,6 +33,7 @@ Elpi derive.param1.trivial is_pa_record.
 Elpi derive.param1.trivial is_pr_record.
 Fail Elpi derive.param1.trivial is_dep_record.
 Elpi derive.param1.trivial is_enum.
+Fail Elpi derive.param1.trivial is_sigma_bool.
 
 End Coverage.
 

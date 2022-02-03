@@ -363,3 +363,50 @@ apply: (vect_induction _ T TA _ _ n (is_peano_witness n) v); rewrite /TA /T => {
 Qed.
 
 End UseEqRect.
+
+
+Module UseEqRect_SB.
+Require Import Eqdep_dec.
+
+Lemma sigma_bool_eqb_correct (sb:sigma_bool) : 
+  eqb_correct_on sigma_bool_eqb sb.
+Proof.
+pose P := eqb_correct_on sigma_bool_eqb.
+apply: (@sigma_bool_induction P).
++ move=> {sb} b isb hb _ sb /=.
+  apply: (@eqb_body_correct sigma_bool
+           sigma_bool_tag
+           sigma_bool_fields_t sigma_bool_fields 
+           sigma_bool_construct
+           sigma_bool_constructP
+           (sigma_bool_eqb_fields (fun=> xpredT))
+           {| depn := b; depeq := hb |} _).
+  rewrite /eqb_fields_correct_on /= => -[b' hb'] /andP [] /= /peano_eqb_correct ? _.
+  subst b'. 
+  (* Now we rewrite UIP *)
+  rewrite (@UIP_dec _ Bool.bool_dec _ _ hb hb').
+  done.
++ (* I don't understand this part *)
+  admit.  
+Admitted.
+
+Lemma sigma_bool_eqb_correct1 (sb:sigma_bool) : 
+  eqb_correct_on sigma_bool_eqb sb.
+Proof.
+case: sb => b hb sb /=.
+apply: (@eqb_body_correct sigma_bool
+           sigma_bool_tag
+           sigma_bool_fields_t sigma_bool_fields 
+           sigma_bool_construct
+           sigma_bool_constructP
+           (sigma_bool_eqb_fields (fun=> xpredT))
+           {| depn := b; depeq := hb |} _).
+rewrite /eqb_fields_correct_on /= => -[b' hb'] /andP [] /= /peano_eqb_correct ? _.
+subst b'. 
+(* Now we rewrite UIP *)
+rewrite (@UIP_dec _ Bool.bool_dec _ _ hb hb').
+done.
+Qed.
+
+
+

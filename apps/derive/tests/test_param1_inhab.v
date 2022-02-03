@@ -31,6 +31,7 @@ Elpi derive.param1.inhab is_pa_record.
 Elpi derive.param1.inhab is_pr_record.
 Fail Elpi derive.param1.inhab is_dep_record.
 Elpi derive.param1.inhab is_enum.
+Fail Elpi derive.param1.inhab is_sigma_bool.
 
 Require Import ssreflect ssrfun ssrbool JMeq.
 
