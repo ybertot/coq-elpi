@@ -1,9 +1,8 @@
 From elpi.apps Require Import derive.param1_inhab.
 
-From elpi.apps Require Import test_derive_stdlib test_param1 test_param1_functor.
+From elpi.apps Require Import test_derive_stdlib test_param1.
 Import test_derive_stdlib.Coverage.
 Import test_param1.Coverage.
-
 
 Module Coverage.
 
@@ -37,6 +36,7 @@ Require Import ssreflect ssrfun ssrbool JMeq.
 
 Section S.
 Context (A:Type) (PA:A -> Type) (hP:full A PA).
+
 
 Lemma is_peano_Zero_inv (i : is_peano Zero): is_Zero = i.
 Proof.
@@ -81,7 +81,7 @@ Check is_seq_witness : forall A P, full A P -> full (seq A) (is_seq A P).
 Check is_rose_witness : forall A P, full A P -> full (rose A) (is_rose A P).
 Fail Check is_nest_witness.
 Check is_w_witness : forall A P, full A P -> full (w A) (is_w A P).
-Fail Check is_vect_witness : forall A P, full A P -> forall i pi, full (vect A i) (is_vect A P i pi).
+Check is_vect_witness : forall A P, full A P -> forall i pi, full (vect A i) (is_vect A P i pi).
 Fail Check is_dyn_witness.
 Check is_zeta_witness : forall A P, full A P -> full (zeta A) (is_zeta A P).
 Check is_beta_witness : forall A P, full A P -> full (beta A) (is_beta A P).

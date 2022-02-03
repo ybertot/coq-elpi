@@ -15,12 +15,14 @@ main I Prefix CLs :- std.do! [
 
   add-indu-correct TI (global (indt I)) Indu IR Lt-correct R,
   std.assert-ok! (coq.typecheck R Ty) "derive.eqbcorrect: add-indu-correct generates ill typed term", 
+/*  coq.say "R =" {coq.term->string R}, */
   Name is Prefix ^ "eqb_correct",
   coq.env.add-const Name R Ty @opaque! Correct,
  
   add-indu-correct-aux TI (global (indt I)) Indu IR Lt-correct Rx,
   std.assert-ok! (coq.typecheck Rx Tyx) "derive.eqbcorrect: add-indu-correct-aux generates ill typed term", 
   Namex is Prefix ^ "eqb_correct_aux",
+/*  coq.say "Rx =" {coq.term->string Rx}, */
   coq.env.add-const Namex Rx Tyx @opaque! Correctx,
  
   /* Refl */
@@ -80,20 +82,28 @@ eqb-refl-aux-for T R :-
   what-for refl-lemma-for eqb-refl-aux-for T R.
 
 what-for What Rec (app [GR | L] as GRL) R :- !, std.do! [
-/*  coq.safe-dest-app GRL GR L, */
+  /* coq.safe-dest-app GRL GR L, */
   What GR Aux,
   mk-reali GR (global (indt ISGR)),
   param1-functor-for ISGR Funct,
   std.map L Rec Recs,
   apply-functor (global Funct) Recs TOTO,
   apply-aux Aux L Aux1, 
-  R = {{ fun (x:lp:GRL) H => lp:Aux1 x (lp:TOTO x H) }}
+  what-for-app GRL Aux1 TOTO R
 ].
+
+/* what-for-app GRL Aux1 TOTO {{ fun (x:lp:GRL) H => lp:Aux1 x H }} :-
+  coq.typecheck TOTO (prod N T x\ (prod _ T1 _\ T2)) _,
+  coq.say "T1 =" {coq.term->string T1},
+  coq.say "T2 =" {coq.term->string T2},
+  T1 = T2. */
+
+what-for-app GRL Aux1 TOTO {{ fun (x:lp:GRL) H => lp:Aux1 x (lp:TOTO x H) }}.
 
 what-for What Rec GR R :- std.do! [
   What GR Aux,
   R = {{ fun (x:lp:GR) H => lp:Aux x H }}
-]. 
+].
 
 pred apply-aux i:term, i:list term, o:term.
 apply-aux Aux [] Aux.
@@ -137,6 +147,7 @@ do-params-correct NP I (prod N T F) K {{ fun (a : lp:T) (eqA : a -> a -> bool) =
   reali a {{ @eqb_correct_on lp:a lp:eqA }} =>
     do-params-correct NP1 {coq.mk-app I [a]} (F a) {{ lp:K lp:a }} (R a eqA).
 
+/*
 pred do-args-correct i:term, i:term, o:term.
 do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) (h : @eqb_correct_on lp:T lp:Cmp x := lp:View x px) => lp:(R x px h) }} :- !, std.do! [
   mk-reali T EqbOn,
@@ -144,9 +155,51 @@ do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) (h : @eqb_cor
   eqb-correct-aux-for T View, 
   @pi-decl N T x\
   @pi-decl `px` {{ lp:EqbOn lp:x }} px\
+  /* FIXME: introduce the let only if EqbOn <> {{ @eqb_correct_on lp:T lp:Cmp }} */
   @pi-def `H` {{ @eqb_correct_on lp:T lp:Cmp lp:x }} {{ lp:View lp:x lp:px }} h\
-     do-args-correct (F x) {{ lp:K lp:x }} (R x px h)
+         do-args-correct (F x) {{ lp:K lp:x }} (R x px h)
+]. */
+
+do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) => lp:(R x px) }} :- !, std.do! [
+  mk-reali T EqbOn,
+  mk-eqb-for T Cmp, 
+  @pi-decl N T x\
+  @pi-decl `px` {{ lp:EqbOn lp:x }} px\
+  do-args-correct-body (F x) T EqbOn x px {{ @eqb_correct_on lp:T lp:Cmp }} {{ lp:K lp:x }} (R x px)
+]. 
+
+do-args-correct-body F T EqbOn X PX EqbOn' K R :- EqbOn = EqbOn', !, 
+/*  coq.say "EqbOn =" {coq.term->string EqbOn},
+    coq.say "EqbOn' =" {coq.term->string EqbOn'}, */
+  do-args-correct F K R.
+
+
+do-args-correct-body F T EqbOn X PX EqbOn' K {{ let h : lp:EqbOn' lp:X := lp:View lp:X lp:PX in lp:(R h) }} :- !,
+/*  coq.say "EqbOn =" {coq.term->string EqbOn},
+   coq.say "EqbOn' =" {coq.term->string EqbOn'}, */
+  eqb-correct-aux-for T View, 
+  @pi-def `H` {{ lp:EqbOn' lp:X }} {{ lp:View lp:X lp:PX }} h\
+    do-args-correct F K  (R h).
+
+
+
+
+/*
+pred do-args-correct i:term, i:term, o:term.
+do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) => lp:(Body x px) }} :- !, std.do! [
+  mk-reali T EqbOn,  coq.say {coq.term->string EqbOn},
+  mk-eqb-for T Cmp, 
+  @pi-decl N T x\
+  @pi-decl `px` {{ lp:EqbOn lp:x }} px\
+  if (EqbOn = {{ @eqb_correct_on lp:T lp:Cmp }}) 
+    (do-args-correct (F x) {{ lp:K lp:x }} (Body x px))
+    (eqb-correct-aux-for T View,!,
+     @pi-def `H` {{ @eqb_correct_on lp:T lp:Cmp lp:x }} {{ lp:View lp:x lp:px }} h\
+         do-args-correct (F x) {{ lp:K lp:x }} (R x px h),
+         Body = {{ let h : @eqb_correct_on lp:T lp:Cmp lp:x := lp:View lp:x lp:px in lp:(R x px h) }})
 ].
+*/
+
  
 do-args-correct T K {{ lp:B : eqb_correct_on lp:Cmp lp:K }} :- std.do! [
   mk-eqb-for T Cmp,

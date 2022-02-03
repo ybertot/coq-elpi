@@ -22,7 +22,7 @@ Inductive rose (A : Type) := Leaf (a : A) | Node (sib : seq (rose A)).
 
 Inductive rose_p (A B : Type) := Leafp (p : pair A B) | Nodep (sib : pair (rose_p A B) (rose_p A B)).
 
-Inductive rose_o (A : Type) := Leafo (a : A) | Nodeo (sib : option (seq (rose A))).
+Inductive rose_o (A : Type) := Leafo (a : A) | Nodeo (x: pair (rose A) (rose A)) (sib : option (seq (rose A))).
 
 Inductive nest A := NilN | ConsN (x : A) (xs : nest (pair A A)).
 

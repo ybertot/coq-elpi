@@ -32,7 +32,7 @@ Elpi derive.induction pa_record.
 Elpi derive.induction pr_record.
 Elpi derive.induction dep_record.
 Elpi derive.induction enum.
-Elpi derive.induction sigma_bool.
+Elpi derive.induction sigma_bool. (* derive.param1: No unary parametricity translation for sigma_bool *)
 End Coverage.
 
 Import Coverage.
@@ -59,3 +59,4 @@ Check pa_record_induction : forall A PA P, (forall x, is_peano x -> forall y, PA
 Check pr_record_induction : forall A pr P, (forall x, is_peano x -> forall y, pr y -> P (Build_pr_record A x y)) -> forall x, is_pr_record A pr x -> P x.
 Check dep_record_induction : forall P, (forall x (px : is_peano x) y, is_vect unit is_unit x px y -> P (Build_dep_record x y)) -> forall x, is_dep_record x -> P x.
 Check enum_induction : forall P, (P E1) -> (P E2) -> (P E3) -> forall x, is_enum x -> P x.
+Check sigma_bool_induction.
