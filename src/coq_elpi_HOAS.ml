@@ -230,7 +230,7 @@ let ({ CD.isc = isconstant; cout = constantout; cin = constantin },constant),
 let uinstancein, _isuinstance, _uinstanceout, uinstance =
   let { CD.cin; isc; cout }, uinstance = CD.declare {
     CD.name = "univ-instance";
-    doc = "Universes level instance for a universe-polymoprhic constant, the mono constant is for monomorphic constants";
+    doc = "Universes level instance for a universe-polymoprhic constant";
     pp = (fun fmt x ->
       let s = Pp.string_of_ppcmds (Univ.Instance.pr Univ.Level.pr x) in
       Format.fprintf fmt "«%s»" s);

@@ -805,8 +805,7 @@ type prop universe. % impredicative sort of propositions
 type sprop universe. % impredicative sort of propositions with definitional proof irrelevance
 type typ univ -> universe. % predicative sort of data (carries a level)
 
-% Universes level instance for a universe-polymoprhic constant, the mono
-% constant is for monomorphic constants
+% Universes level instance for a universe-polymoprhic constant
 typeabbrev univ-instance (ctype "univ-instance").
 
 
