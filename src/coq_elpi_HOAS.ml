@@ -1036,22 +1036,19 @@ let rec constr2lp coq_ctx ~calldepth ~depth state t =
          let state, hd = aux ~depth env state hd in
          let state, args = CArray.fold_left_map (aux ~depth env) state args in
          state, in_elpi_app ~depth hd args
-    | C.Const(c,i) when Univ.Instance.is_empty (EC.EInstance.kind sigma i) ->
-         let gref = G.ConstRef c in
-         state, in_elpi_gr ~depth state gref
+    | C.Const(c,i) when Global.is_polymorphic (G.ConstRef c) ->
+         state, in_elpi_poly_gr_instance ~depth state (G.ConstRef c) (EC.EInstance.kind sigma i)
     | C.Const(c,i) ->
-          let gref = G.ConstRef c in
-          state, in_elpi_poly_gr_instance ~depth state gref (EC.EInstance.kind sigma i)
-    | C.Ind (ind, i) when Univ.Instance.is_empty (EC.EInstance.kind sigma i) ->
-         state, in_elpi_gr ~depth state (G.IndRef ind)
-    | C.Ind (ind, i) ->
+         state, in_elpi_gr ~depth state (G.ConstRef c)
+    | C.Ind (ind, i) when Global.is_polymorphic (G.IndRef ind) ->
          state, in_elpi_poly_gr_instance ~depth state (G.IndRef ind) (EC.EInstance.kind sigma i)
-    | C.Construct (construct, i) when Univ.Instance.is_empty (EC.EInstance.kind sigma i) ->
-         let gref = G.ConstructRef construct in
-         state, in_elpi_gr ~depth state gref
-    | C.Construct (construct, i) ->
+    | C.Ind (ind, i) ->
+         state, in_elpi_gr ~depth state (G.IndRef ind)
+    | C.Construct (construct, i) when Global.is_polymorphic (G.ConstructRef construct) ->
          let gref = G.ConstructRef construct in
          state, in_elpi_poly_gr_instance ~depth state gref (EC.EInstance.kind sigma i)
+    | C.Construct (construct, i) ->
+         state, in_elpi_gr ~depth state (G.ConstructRef construct)
     | C.Case(ci, u, pms, rt, iv, t, bs) ->
          let (_, rt, _, t, bs) = EConstr.expand_case env sigma (ci, u, pms, rt, iv, t, bs) in
          let state, t = aux ~depth env state t in
