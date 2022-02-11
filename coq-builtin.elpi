@@ -827,6 +827,9 @@ external pred coq.univ.sup i:univ, i:univ.
 % [coq.univ.max U1 U2 U3] constrains U3 = max U1 U2
 external pred coq.univ.max i:univ, i:univ, o:univ.
 
+% [coq.univ.is-global U] succeeds if U is a global universe
+external pred coq.univ.is-global i:univ.
+
 % Very low level, don't use
 
 % [coq.univ.algebraic-max U1 U2 U3] constrains U3 = Max(U1,U2) *E*
@@ -1454,6 +1457,44 @@ external pred coq.gref.map.find i:gref, i:coq.gref.map A, o:A.
 % [coq.gref.map.bindings M L] L is M transformed into an associative list
 external pred coq.gref.map.bindings i:coq.gref.map A, 
                                     o:list (pair gref A).
+
+kind coq.univ.set type.
+
+% [coq.univ.set.empty A] The empty set
+external pred coq.univ.set.empty o:coq.univ.set.
+
+% [coq.univ.set.mem Elem A] Checks if Elem is in a
+external pred coq.univ.set.mem i:univ, i:coq.univ.set.
+
+% [coq.univ.set.add Elem A B] B is A union {Elem}
+external pred coq.univ.set.add i:univ, i:coq.univ.set, o:coq.univ.set.
+
+% [coq.univ.set.remove Elem A B] B is A \ {Elem}
+external pred coq.univ.set.remove i:univ, i:coq.univ.set, o:coq.univ.set.
+
+% [coq.univ.set.union A B X] X is A union B
+external pred coq.univ.set.union i:coq.univ.set, i:coq.univ.set, 
+                                 o:coq.univ.set.
+
+% [coq.univ.set.inter A B X] X is A intersection B
+external pred coq.univ.set.inter i:coq.univ.set, i:coq.univ.set, 
+                                 o:coq.univ.set.
+
+% [coq.univ.set.diff A B X] X is A \ B
+external pred coq.univ.set.diff i:coq.univ.set, i:coq.univ.set, 
+                                o:coq.univ.set.
+
+% [coq.univ.set.equal A B] tests A and B for equality
+external pred coq.univ.set.equal i:coq.univ.set, i:coq.univ.set.
+
+% [coq.univ.set.subset A B] tests if A is a subset of B
+external pred coq.univ.set.subset i:coq.univ.set, i:coq.univ.set.
+
+% [coq.univ.set.elements M L] L is M transformed into list
+external pred coq.univ.set.elements i:coq.univ.set, o:list univ.
+
+% [coq.univ.set.cardinal M N] N is the number of elements of M
+external pred coq.univ.set.cardinal i:coq.univ.set, o:int.
 
 % Coq box types for pretty printing:
 % - Vertical block: each break leads to a new line

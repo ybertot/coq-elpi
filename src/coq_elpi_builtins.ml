@@ -1884,6 +1884,17 @@ denote the same x as before.|};
     state, !: u3, [])),
   DocAbove);
 
+  MLCode(Pred("coq.univ.is-global",
+    In(univ, "U",
+    Easy "succeeds if U is a global universe"),
+  (fun u ~depth ->
+    let global_univs = UGraph.domain (Environ.universes (Global.env ())) in
+    match Univ.Universe.level u with
+    | Some l when Univ.Level.Set.mem l global_univs -> ()
+    | _ -> raise No_clause (* err Pp.(Univ.Universe.pr u ++ str " is not global") *)
+  )),
+  DocAbove);
+
   LPDoc "Very low level, don't use";
 
   MLCode(Pred("coq.univ.algebraic-max",
