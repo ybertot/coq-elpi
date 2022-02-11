@@ -109,6 +109,7 @@ pred copy i:term, o:term.
 :name "copy:start"
 copy X Y :- name X, !, X = Y, !. % avoid loading "copy x x" at binders
 copy (global _ as C) C :- !.
+copy (pglobal _ _ as C) C :- !.
 copy (sort _ as C) C :- !.
 copy (fun N T F) (fun N T1 F1) :- !,
   copy T T1, pi x\ copy (F x) (F1 x).
