@@ -160,6 +160,8 @@ val uinstance : Univ.Instance.t Conversion.t
 module GRMap : Elpi.API.Utils.Map.S with type key = Names.GlobRef.t
 module GRSet : Elpi.API.Utils.Set.S with type elt = Names.GlobRef.t
 
+module UnivSet : Elpi.API.Utils.Set.S with type elt = Univ.Universe.t
+
 (* CData relevant for other modules, e.g the one exposing Coq's API *)
 val isuniv : RawOpaqueData.t -> bool
 val univout : RawOpaqueData.t -> Univ.Universe.t

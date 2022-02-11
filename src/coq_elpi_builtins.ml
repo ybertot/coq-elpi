@@ -3115,6 +3115,7 @@ Supported attributes:
   ] @
   B.ocaml_set ~name:"coq.gref.set" gref (module GRSet) @
   B.ocaml_map ~name:"coq.gref.map" gref (module GRMap) @
+  B.ocaml_set ~name:"coq.univ.set" univ (module UnivSet) @
   [
   MLData ppbox;
   MLData ppboxes;
