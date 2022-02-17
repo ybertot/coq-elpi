@@ -139,9 +139,9 @@ Elpi Accumulate File "tag.elpi" From elpi.apps.derive.
 Elpi Accumulate Db derive.fields.db.
 Elpi Accumulate File "fields.elpi" From elpi.apps.derive.
 Elpi Accumulate Db derive.eqb.db.
-Elpi Accumulate File "elpi/eqb.elpi" From elpi.apps.derive.
+Elpi Accumulate File "eqb.elpi" From elpi.apps.derive.
 Elpi Accumulate Db derive.eqbcorrect.db.
-Elpi Accumulate File "elpi/eqbcorrect.elpi" From elpi.apps.derive.
+Elpi Accumulate File "eqbcorrect.elpi" From elpi.apps.derive.
 Close Scope positive_scope.
 
 Elpi Accumulate File "derive.elpi" From elpi.apps.derive.

@@ -45,8 +45,8 @@ Elpi Accumulate Db derive.tag.db.
 Elpi Accumulate Db derive.fields.db.
 Elpi Accumulate Db derive.eqb.db.
 Elpi Accumulate Db derive.eqbcorrect.db.
-Elpi Accumulate File "elpi/fields.elpi".
-Elpi Accumulate File "elpi/eqb.elpi".
+Elpi Accumulate File "fields.elpi" From elpi.apps.derive.
+Elpi Accumulate File "eqb.elpi" From elpi.apps.derive.
 
 Elpi Accumulate lp:{{
 

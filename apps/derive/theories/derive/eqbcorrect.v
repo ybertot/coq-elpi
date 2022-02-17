@@ -24,9 +24,9 @@ Elpi Accumulate Db derive.eqbcorrect.db.
 Elpi Accumulate Db derive.induction.db.
 Elpi Accumulate Db derive.param1.inhab.db.
 Elpi Accumulate Db derive.param1.functor.db. 
-Elpi Accumulate File "elpi/eqbcorrect.elpi".
-Elpi Accumulate File "paramX-lib.elpi". 
-Elpi Accumulate File "elpi/param1.elpi".
+Elpi Accumulate File "eqbcorrect.elpi" From elpi.apps.derive.
+Elpi Accumulate File "paramX-lib.elpi" From elpi.apps.derive. 
+Elpi Accumulate File "param1.elpi" From elpi.apps.derive.
 Elpi Accumulate Db derive.param1.db.
 
 Elpi Accumulate lp:{{

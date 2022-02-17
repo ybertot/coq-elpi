@@ -20,7 +20,7 @@ pred fields-for
 }}.
 
 Elpi Command derive.fields.
-Elpi Accumulate File "elpi/fields.elpi".
+Elpi Accumulate File "fields.elpi" From elpi.apps.derive.
 Elpi Accumulate Db derive.tag.db.
 Elpi Accumulate Db derive.fields.db.
 Elpi Accumulate lp:{{

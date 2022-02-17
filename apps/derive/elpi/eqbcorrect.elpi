@@ -98,9 +98,10 @@ what-for What Rec (app [GR | L] as GRL) R :- !, std.do! [
   coq.say "T2 =" {coq.term->string T2},
   T1 = T2. */
 
+pred what-for-app i:term, i:term, i:term, o:term.
 what-for-app GRL Aux1 TOTO {{ fun (x:lp:GRL) H => lp:Aux1 x (lp:TOTO x H) }}.
 
-what-for What Rec GR R :- std.do! [
+what-for What _Rec GR R :- std.do! [ % ???
   What GR Aux,
   R = {{ fun (x:lp:GR) H => lp:Aux x H }}
 ].
@@ -160,6 +161,7 @@ do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) (h : @eqb_cor
          do-args-correct (F x) {{ lp:K lp:x }} (R x px h)
 ]. */
 
+pred do-args-correct i:term, i:term, o:term.
 do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) => lp:(R x px) }} :- !, std.do! [
   mk-reali T EqbOn,
   mk-eqb-for T Cmp, 
@@ -168,13 +170,14 @@ do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) => lp:(R x px
   do-args-correct-body (F x) T EqbOn x px {{ @eqb_correct_on lp:T lp:Cmp }} {{ lp:K lp:x }} (R x px)
 ]. 
 
-do-args-correct-body F T EqbOn X PX EqbOn' K R :- EqbOn = EqbOn', !, 
+pred do-args-correct-body i:term, i:term, i:term, i:term, i:term, i:term, i:term, o:term.
+do-args-correct-body F _T EqbOn _X _PX EqbOn' K R :- EqbOn = EqbOn', !, 
 /*  coq.say "EqbOn =" {coq.term->string EqbOn},
     coq.say "EqbOn' =" {coq.term->string EqbOn'}, */
   do-args-correct F K R.
 
 
-do-args-correct-body F T EqbOn X PX EqbOn' K {{ let h : lp:EqbOn' lp:X := lp:View lp:X lp:PX in lp:(R h) }} :- !,
+do-args-correct-body F T _EqbOn X PX EqbOn' K {{ let h : lp:EqbOn' lp:X := lp:View lp:X lp:PX in lp:(R h) }} :- !,
 /*  coq.say "EqbOn =" {coq.term->string EqbOn},
    coq.say "EqbOn' =" {coq.term->string EqbOn'}, */
   eqb-correct-aux-for T View, 
@@ -246,7 +249,7 @@ add-indu-correct-aux (prod N T F) I Indu IR LS {{ fun (a : lp:T) (eqA : a -> a -
      {{ lp:IR lp:a (@eqb_correct_on lp:a lp:eqA)}} 
      {std.map LS (t\coq.mk-app t [a, eqA])} (R a eqA).
 
-add-indu-correct-aux _T I Indu IR LS R :- 
+add-indu-correct-aux _T I Indu _IR LS R :- 
   mk-eqb-for I Cmp, 
   R = app [Indu, {{ @eqb_correct_on lp:I lp:Cmp }} | LS].
 
@@ -335,7 +338,7 @@ add-indu-refl-aux (prod N T F) I Indu IR LS {{ fun (a : lp:T) (eqA : a -> a -> b
      {{ lp:IR lp:a (@eqb_refl_on lp:a lp:eqA)}} 
      {std.map LS (t\coq.mk-app t [a, eqA])} (R a eqA).
 
-add-indu-refl-aux _T I Indu IR LS R :- std.do![
+add-indu-refl-aux _T I Indu _IR LS R :- std.do![
     mk-eqb-for I Cmp,              
     R = app [Indu, {{ @eqb_refl_on lp:I lp:Cmp}} | LS]
 ].
