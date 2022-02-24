@@ -89,7 +89,17 @@ Definition is_zero (n:peano) : bool :=
   | _ => false
   end.
 
-
 Record sigma_bool := { depn : peano; depeq : is_zero depn = true }.
+
+Fixpoint is_leq (n m:peano) : bool := 
+  match n, m with 
+  | Zero, _ => true 
+  | Succ n, Succ m => is_leq n m
+  | _, _ => false
+  end.
+
+Inductive ord (p : peano) := mkOrd (n : peano) (l : is_leq n p = true).
+
+Inductive val := V (p : peano) (o : ord p).
 
 End Coverage.

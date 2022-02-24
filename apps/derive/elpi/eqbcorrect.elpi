@@ -10,12 +10,14 @@ main I Prefix CLs :- std.do! [
   mk-reali (global (indt I)) IR, % param1-db, really
  
   /* Correctness */
-
+coq.say "0" I,
   std.map2 KTs Ks (add-decl-correct Prefix N (global (indt I))) Lt-correct,
-
+coq.say "1",
   add-indu-correct TI (global (indt I)) Indu IR Lt-correct R,
+coq.say "2",
+
   std.assert-ok! (coq.typecheck R Ty) "derive.eqbcorrect: add-indu-correct generates ill typed term", 
-/*  coq.say "R =" {coq.term->string R}, */
+  %coq.say "R =" {coq.term->string R}, 
   Name is Prefix ^ "eqb_correct",
   coq.env.add-const Name R Ty @opaque! Correct,
  
@@ -125,6 +127,7 @@ add-decl-correct _Prefix N I KT K R /*(global (const P))*/ :- std.do![
 
 pred mk-reali i:term, o:term.
 mk-reali T R :- !,
+  coq.say "REALI" {coq.term->string T},
   std.assert! (reali T R) {calc (
     "derive.eqbcorrect: no unary parametricity translation for " ^ {coq.term->string T} ^ ", use derive.param1 first")}.
 
@@ -133,6 +136,11 @@ mk-eqb-for T R :- !,
   std.assert! (eqb-for T R) {calc (
     "derive.eqbcorrect: boolean equality for " ^ {coq.term->string T} ^ ", maybe use derive.eqb first")}.
 
+pred is-a-type i:term.
+is-a-type (sort (typ _)).
+is-a-type (sort prop) :- coq.error "derive.eqb: parameters in Prop are not supported".
+is-a-type T :- whd1 T T1, is-a-type T1.
+
 pred do-params-correct i:int, i:term, i:term, i:term, o:term.
 do-params-correct 0 I T K R :- !, 
   mk-eqb-for I Cmp,
@@ -140,13 +148,18 @@ do-params-correct 0 I T K R :- !,
   eqb-correct-aux-for I {{ fun x H => H }} => 
   do-args-correct T K R.
 
-do-params-correct NP I (prod N T F) K {{ fun (a : lp:T) (eqA : a -> a -> bool) => lp:(R a eqA) }} :- NP > 0, !, NP1 is NP - 1,
+do-params-correct NP I (prod N T F) K {{ fun (a : lp:T) (eqA : a -> a -> bool) => lp:(R a eqA) }} :- NP > 0, is-a-type T, !, NP1 is NP - 1,
   @pi-decl N T a\
   @pi-decl `eqA` {{ lp:a -> lp:a -> bool }} eqA\
   eqb-for a eqA =>
   eqb-correct-aux-for a {{ fun (x: lp:a) (H : @eqb_correct_on lp:a lp:eqA x) => H }} => 
   reali a {{ @eqb_correct_on lp:a lp:eqA }} =>
     do-params-correct NP1 {coq.mk-app I [a]} (F a) {{ lp:K lp:a }} (R a eqA).
+
+do-params-correct NP I (prod N T F) K {{ fun (a : lp:T) => lp:(R a) }} :- NP > 0, !, NP1 is NP - 1,
+  @pi-decl N T a\
+    reali a {{ fun (a : lp:T) => True }} =>
+    do-params-correct NP1 {coq.mk-app I [a]} (F a) {{ lp:K lp:a }} (R a).
 
 /*
 pred do-args-correct i:term, i:term, o:term.

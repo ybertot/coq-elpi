@@ -33,6 +33,8 @@ Elpi derive.induction pr_record.
 Elpi derive.induction dep_record.
 Elpi derive.induction enum.
 Elpi derive.induction sigma_bool. (* derive.param1: No unary parametricity translation for sigma_bool *)
+Elpi derive.induction ord.
+Elpi derive.induction val.
 End Coverage.
 
 Import Coverage.

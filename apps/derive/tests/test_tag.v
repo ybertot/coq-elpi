@@ -31,6 +31,8 @@ Elpi derive.tag pr_record.
 Elpi derive.tag dep_record.
 Elpi derive.tag enum.
 Elpi derive.tag sigma_bool.
+Elpi derive.tag ord.
+Elpi derive.tag val.
 End Coverage.
 
 Import Coverage.
@@ -57,3 +59,5 @@ Check prim_int_tag : tag prim_int.
 Check prim_float_tag : tag prim_float.
 Check pa_record_tag : forall A, tag (pa_record A).
 Check pr_record_tag : forall A, tag (pr_record A).
+Check ord_tag : forall p : peano, tag (ord p).
+Check val_tag : tag val.

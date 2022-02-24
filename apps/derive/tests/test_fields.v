@@ -31,6 +31,8 @@ Fail Elpi derive.fields pr_record. (* fixme elaborate *)
 Elpi derive.fields dep_record.
 Elpi derive.fields enum.
 Elpi derive.fields sigma_bool.
+Elpi derive.fields ord.
+Elpi derive.fields val.
 End Coverage.
 
 Import Coverage.

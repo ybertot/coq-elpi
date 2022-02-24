@@ -60,8 +60,11 @@ Fail Elpi derive.eqbcorrect pr_record.
 Fail Elpi derive.eqbcorrect dep_record.
 Elpi derive.eqbcorrect enum.
 Fail Elpi derive.eqbcorrect sigma_bool. (* A lot is missing for this one *)
+(*Elpi derive.eqbcorrect ord.
+Elpi derive.eqbcorrect val.*)
 
 End Coverage.
+
 Import Coverage.
 Import PArith.
 
@@ -368,6 +371,11 @@ Require Import Eqdep_dec.
 
 Module UseEqRect_SB.
 
+ 
+From elpi.apps.derive.tests Require Import test_param1_trivial.
+Import test_param1_trivial.Coverage.
+About is_bool_trivial.
+
 Lemma sigma_bool_eqb_correct (sb:sigma_bool) : 
   eqb_correct_on sigma_bool_eqb sb.
 Proof.
@@ -386,9 +394,24 @@ apply: (@sigma_bool_induction P).
   (* Now we rewrite UIP *)
   rewrite (@UIP_dec _ Bool.bool_dec _ _ hb hb').
   done.
-+ (* I don't understand this part *)
-  admit.  
-Admitted.
++ clear P.
+  case: sb => p1 p2.
+  eapply (@is_Build_sigma_bool _ (is_peano_witness p1)).
+
+  have is_eq_witness A (PA : A -> Type) (x y :A) (px: PA x) (py : PA y)
+      (eq_xy : x = y) (eq_pxpy : py = @eq_rect A x PA px y eq_xy)
+    : is_eq A PA x px y py eq_xy.
+    destruct eq_xy.
+    simpl in eq_pxpy.
+    subst.
+    constructor.
+  eapply is_eq_witness.
+  case: (is_bool_trivial true) => ? H.
+  rewrite -[LHS]H.
+  rewrite -[RHS]H.
+  by [].
+Qed.
+Print is_bool.
 
 Lemma sigma_bool_eqb_correct1 (sb:sigma_bool) : 
   eqb_correct_on sigma_bool_eqb sb.

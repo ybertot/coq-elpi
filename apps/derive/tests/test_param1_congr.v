@@ -32,6 +32,7 @@ Elpi derive.param1.congr is_pa_record.
 Elpi derive.param1.congr is_pr_record.
 Elpi derive.param1.congr is_dep_record.
 Elpi derive.param1.congr is_enum.
+Elpi derive.param1.congr is_bool.
 
 End Coverage.
 

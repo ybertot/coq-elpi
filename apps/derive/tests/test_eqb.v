@@ -34,6 +34,9 @@ Fail Elpi derive.eqb pr_record. (* fixme elaborate *)
 Elpi derive.eqb dep_record.
 Elpi derive.eqb enum.
 Elpi derive.eqb sigma_bool.
+Elpi derive.eqb ord.
+Elpi derive.eqb val.
+
 End Coverage.
 Import Coverage.
 Import PArith.
@@ -64,3 +67,5 @@ Check pa_record_eqb : forall A, eq_test A -> eq_test (pa_record A).
 Fail Check pr_record_eqb : forall A, eq_test A -> eq_test (pr_record A).
 Check enum_eqb : eq_test enum.
 Check sigma_bool_eqb : eq_test sigma_bool.
+Check ord_eqb : forall p, eq_test (ord p).
+Check val_eqb : eq_test val.

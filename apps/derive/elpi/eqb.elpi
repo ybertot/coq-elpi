@@ -29,11 +29,21 @@ main I Prefix CL :- std.do! [
   std.forall CL (x\ coq.elpi.accumulate _ "derive.eqb.db" (clause _ _ x)),
 ].
 
+pred is-a-type i:term.
+is-a-type (sort (typ _)).
+is-a-type (sort prop) :- coq.error "derive.eqb: parameters in Prop are not supported".
+is-a-type T :- whd1 T T1, !, is-a-type T1.
+
 pred do-params i:int, i:term, i:term, i:term, o:term.
-do-params N {{ forall x : lp:T, lp:(F x) }} I EF {{ fun (x : lp:T) (eqx : x -> x -> bool) => lp:(R x eqx) }}  :- N > 0, !, M is N - 1,
+do-params N {{ forall x : lp:T, lp:(F x) }} I EF {{ fun (x : lp:T) (eqx : x -> x -> bool) => lp:(R x eqx) }}  :- N > 0, is-a-type T, !, M is N - 1,
   @pi-decl `x` T x\
   @pi-decl `eqx` {{ lp:x -> lp:x -> bool }} eqx\
     do-params M (F x) {coq.mk-app I [x]} {coq.mk-app EF [x,eqx]} (R x eqx).
+do-params N {{ forall x : lp:T, lp:(F x) }} I EF {{ fun (x : lp:T) => lp:(R x) }}  :- N > 0, !, M is N - 1,
+  @pi-decl `x` T x\
+    do-params M (F x) {coq.mk-app I [x]} {coq.mk-app EF [x]} (R x).
+
+    
 /* FIXME: ICI */
 do-params 0 _ I EF {{ fix rec (x1 x2 : lp:I) {struct x1} : bool := lp:(R rec x1 x2) }} :-
   coq.safe-dest-app I (global (indt Ind)) _, coq.env.recursive? Ind, !,
@@ -76,9 +86,12 @@ to-tuple [X|XS] [_T|TS] {{ ( lp:X, lp:R ) }} :-
 
 % example: eqb-for {{ list lp:A }} {{ @list_eqb lp:A lp:F }} :- eqb-for A F.
 pred do-clause i:int, i:term, i:term, i:term, i:list prop, o:prop.
-do-clause N {{ forall p, lp:(A p) }} I F Todo (pi a ea\ C a ea) :- N > 0, !, M is N - 1,
+do-clause N {{ forall p : lp:T, lp:(A p) }} I F Todo (pi a ea\ C a ea) :- N > 0, is-a-type T, !, M is N - 1,
   pi a ea\
     do-clause M (A a) {coq.mk-app I [a]} {coq.mk-app F [a,ea]} [eqb-for a ea|Todo] (C a ea).
+do-clause N {{ forall p, lp:(A p) }} I F Todo (pi a\ C a) :- N > 0, !, M is N - 1,
+  pi a\
+    do-clause M (A a) {coq.mk-app I [a]} {coq.mk-app F [a]} Todo (C a).
 do-clause 0 _ I F Todo (eqb-for I F :- Todo).
 
 }
@@ -86,13 +99,17 @@ do-clause 0 _ I F Todo (eqb-for I F :- Todo).
 % -----------------------------------------------------------------------------
 
 namespace derive.eqbf {
-
+  
 pred do-params i:int, i:term, i:term, o:term.
-do-params J {{ forall p : lp:T, lp:(F p) }} I {{ fun (p : lp:T) (eqp : p -> p -> bool) => lp:(R p eqp) }} :- J > 0, !, K is J - 1,
+do-params J {{ forall p : lp:T, lp:(F p) }} I {{ fun (p : lp:T) (eqp : p -> p -> bool) => lp:(R p eqp) }} :- J > 0, derive.eqb.is-a-type T, !, K is J - 1,
   @pi-decl `P` T p\
   @pi-decl `eqP` {{ lp:p -> lp:p -> bool }} eqP\
     eqb-for p eqP =>
     do-params K (F p) {coq.mk-app I [p]} (R p eqP).
+
+do-params J {{ forall p : lp:T, lp:(F p) }} I {{ fun (p : lp:T) => lp:(R p) }} :- J > 0, !, K is J - 1,
+  @pi-decl `P` T p\
+    do-params K (F p) {coq.mk-app I [p]} (R p).
 
 do-params 0 _ Ind {{ fun (rec : lp:Ind -> lp:Ind -> bool) (x : positive) => lp:(R rec x) }} :- std.do! [
   coq.safe-dest-app Ind (global (indt I)) Params,
@@ -142,9 +159,13 @@ do-fields.aux _T _ _ {{ true }}. % :- coq.error "no comparison for" T.
 %      eqb-for A EA, eqb-for {{ list lp:A }} ELA.
 
 pred do-clause i:int, i:term, i:term, i:term, i:list prop, o:prop.
-do-clause N (prod _ _ A) I F Todo (pi a ea\ C a ea) :- N > 0, !, M is N - 1,
+do-clause N (prod _ T A) I F Todo (pi a ea\ C a ea) :- N > 0, derive.eqb.is-a-type T, !, M is N - 1,
   pi a ea\
     do-clause M (A a) {coq.mk-app I [a]} {coq.mk-app F [a,ea]} [eqb-for a ea|Todo] (C a ea).
+
+do-clause N (prod _ _ A) I F Todo (pi a\ C a) :- N > 0, !, M is N - 1,
+  pi a \
+    do-clause M (A a) {coq.mk-app I [a]} {coq.mk-app F [a]} Todo (C a).
 
 do-clause 0 _ I F Todo (pi ela\ eqb-fields I (F1 ela) :- [C ela|Todo]) :-
   pi ela\

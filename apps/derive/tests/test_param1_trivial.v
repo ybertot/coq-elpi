@@ -33,7 +33,10 @@ Elpi derive.param1.trivial is_pa_record.
 Elpi derive.param1.trivial is_pr_record.
 Fail Elpi derive.param1.trivial is_dep_record.
 Elpi derive.param1.trivial is_enum.
+Elpi derive.param1.trivial is_bool.
 Fail Elpi derive.param1.trivial is_sigma_bool.
+Fail Elpi derive.param1.trivial is_ord.
+Fail Elpi derive.param1.trivial is_val.
 
 End Coverage.
 
@@ -61,3 +64,4 @@ Check is_fo_record_trivial : trivial fo_record is_fo_record.
 Check is_pa_record_trivial : forall A P, trivial A P -> trivial (pa_record A) (is_pa_record A P).
 Check is_pr_record_trivial : forall A P, trivial A P -> trivial (pr_record A) (is_pr_record A P).
 Check is_enum_trivial : trivial enum is_enum.
+Check is_bool_trivial : trivial bool is_bool.
