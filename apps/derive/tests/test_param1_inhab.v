@@ -72,7 +72,7 @@ contracts peano is_peano x (is_peano_witness x)
       end) x).
 (* end copy paste *)
 
-Lemma is_vect_witness A (PA : A -> Type) (HA : trivial A PA) (i : peano) (pi: is_peano i) :
+Lemma is_vect_witness A (PA : A -> Type) (HA : full A PA) (i : peano) (pi: is_peano i) :
   forall (v : vect A i), is_vect A PA i pi v.
 rewrite <- (trivial_uniq _ _ is_peano_trivial i pi). clear pi.
 revert i.
@@ -81,7 +81,7 @@ intros i v. case v.
   constructor 1.
 intros x j xs.
   constructor 2.
-  apply trivial_full. apply HA.
+  apply HA.
   apply rec.
 Qed.
 
@@ -91,6 +91,7 @@ Fail Elpi derive.param1.inhab is_sigma_bool.
 Fail Elpi derive.param1.inhab is_ord.
 Fail Elpi derive.param1.inhab is_val.
 
+(*
 Require Import ssreflect ssrfun ssrbool JMeq.
 
 Section S.
@@ -126,7 +127,7 @@ Fixpoint is_vect_witness (i:peano) (pi:is_peano i) (v:vect A i) : is_vect A PA i
           (is_VCons A PA a (hP a) m pm v' (is_vect_witness m pm v')) pi0 (projT2 inj)
   end pi.
 End S.
-
+*)
 End Coverage.
 
 Import Coverage.
