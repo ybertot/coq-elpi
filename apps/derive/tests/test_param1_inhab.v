@@ -32,6 +32,60 @@ Elpi derive.param1.inhab is_pr_record.
 Fail Elpi derive.param1.inhab is_dep_record.
 Elpi derive.param1.inhab is_enum.
 Elpi derive.param1.inhab is_bool.
+
+Lemma is_eq_witness A (PA : A -> Type) (HA : trivial A PA) (x : A) (px: PA x) 
+ y (py : PA y) (eq_xy : x = y)
+: is_eq A PA x px y py eq_xy.
+rewrite <- (trivial_uniq _ _ HA x px). clear px.
+rewrite <- (trivial_uniq _ _ HA y py). clear py.
+case eq_xy.
+constructor.
+Qed.
+
+(* These are done, but in the other file *)
+Definition congr_is_Zero : is_Zero = is_Zero := eq_refl.
+
+Definition congr_is_Succ : forall (x : peano) (p1 p2 : is_peano x),
+p1 = p2 -> is_Succ x p1 = is_Succ x p2 :=
+fun (x : peano) (p1 p2 : is_peano x) (e : p1 = p2) =>
+match e in (_ = i) return (is_Succ x p1 = is_Succ x i) with
+| eq_refl => eq_refl
+end.
+
+Definition is_peano_trivial : trivial peano is_peano :=
+fun x : peano =>
+contracts peano is_peano x (is_peano_witness x)
+  ((fix IH (x0 : peano) (y : is_peano x0) {struct y} :
+	    is_peano_witness x0 = y :=
+      match y as i in (is_peano s1) return (is_peano_witness s1 = i) with
+      | is_Zero => congr_is_Zero
+      | is_Succ n Pn =>
+          congr_is_Succ n
+            (trivial_full peano is_peano
+               (fun x1 : peano =>
+                contracts peano is_peano x1 (is_peano_witness x1) (IH x1)) n)
+            Pn
+            (trivial_uniq peano is_peano
+               (fun x1 : peano =>
+                contracts peano is_peano x1 (is_peano_witness x1) (IH x1)) n
+               Pn)
+      end) x).
+(* end copy paste *)
+
+Lemma is_vect_witness A (PA : A -> Type) (HA : trivial A PA) (i : peano) (pi: is_peano i) :
+  forall (v : vect A i), is_vect A PA i pi v.
+rewrite <- (trivial_uniq _ _ is_peano_trivial i pi). clear pi.
+revert i.
+fix rec 2.
+intros i v. case v.
+  constructor 1.
+intros x j xs.
+  constructor 2.
+  apply trivial_full. apply HA.
+  apply rec.
+Qed.
+
+
 Fail Elpi derive.param1.inhab is_eq.
 Fail Elpi derive.param1.inhab is_sigma_bool.
 Fail Elpi derive.param1.inhab is_ord.
