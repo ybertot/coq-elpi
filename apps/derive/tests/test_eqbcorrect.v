@@ -39,6 +39,9 @@ Fail Elpi derive.eqbcorrect zeta. (* FIXME *)
 Elpi derive.eqbcorrect beta.
 Print beta_eqb_correct.
 Fail Elpi derive.eqbcorrect iota.
+(*
+Elpi derive.eqbcorrect large.
+*)
 
 (* FIXME: how to do this properly *)
 (*
@@ -59,9 +62,11 @@ Elpi derive.eqbcorrect pa_record.
 Fail Elpi derive.eqbcorrect pr_record.   
 Fail Elpi derive.eqbcorrect dep_record.
 Elpi derive.eqbcorrect enum.
+Fail Elpi derive.eqbcorrect eq.
+Elpi derive.eqbcorrect bool.
 Fail Elpi derive.eqbcorrect sigma_bool. (* A lot is missing for this one *)
-(*Elpi derive.eqbcorrect ord.
-Elpi derive.eqbcorrect val.*)
+Fail Elpi derive.eqbcorrect ord.
+Fail Elpi derive.eqbcorrect val.
 
 End Coverage.
 

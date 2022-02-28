@@ -68,37 +68,6 @@ Check is_pr_record : forall A, pred A -> pred (pr_record A).
 Check is_enum : pred enum.
 Check is_ord : forall (p : peano) (pa : is_peano p), pred (ord p).
 Check is_val : pred val.
-(*
-Inductive toto (p : peano) : pair peano unit -> Type :=
-  totoK : toto p (Comma peano unit p tt).
-
-
-Inductive tit A := boxF (f : A -> A).
-
-
-  Elpi derive.param1 tit.
-
-Print is_tit.
-
-Lemma tit_witness : 
-forall A PA (f : A -)
-       (t : tit f), is_tif f PF t.
-
-
-  Print is_toto.
-
- Lemma toto_witness : 
-   forall (p : peano) (pp : is_peano p)
-          (q : pair peano unit) (pq:is_pair peano is_peano unit is_unit q)
-          (t : toto p q), is_toto p pp q pq t.
-   intros.
-   destruct t.
-   destruct pq.
-
-    
-  *)
-
-
 
 End Test.
 

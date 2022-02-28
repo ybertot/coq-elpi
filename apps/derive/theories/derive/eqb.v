@@ -32,6 +32,7 @@ pred eqb-fields
   o:term, % type
   o:term. % eq_fields_type
 
+eqb-for {{PrimFloat.float}} {{PrimFloat.eqb}}.
 eqb-for {{ @is_true lp:X }} {{ fun (_ _ : @is_true lp:X) => true }}.
 eqb-for {{ @eq bool lp:X true }} {{ fun (_ _ : @eq bool lp:X true) => true }}.
    /* Generalize over bool and true, have a list of uip, i.e use  eqcorrect-for */ 

@@ -30,6 +30,11 @@ Elpi derive.map pa_record.
 Elpi derive.map pr_record.
 Elpi derive.map dep_record.
 Elpi derive.map enum.
+Fail Elpi derive.map eq.
+Elpi derive.map bool.
+Elpi derive.map sigma_bool.
+Fail Elpi derive.map ord.
+Elpi derive.map val.
 End Coverage.
 
 Import Coverage.

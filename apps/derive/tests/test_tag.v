@@ -30,6 +30,8 @@ Elpi derive.tag pa_record.
 Elpi derive.tag pr_record.
 Elpi derive.tag dep_record.
 Elpi derive.tag enum.
+Elpi derive.tag eq.
+Elpi derive.tag bool.
 Elpi derive.tag sigma_bool.
 Elpi derive.tag ord.
 Elpi derive.tag val.

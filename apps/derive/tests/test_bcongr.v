@@ -23,7 +23,9 @@ Fail Elpi derive.bcongr dyn.
 Elpi derive.bcongr zeta.
 Elpi derive.bcongr beta.
 Fail Elpi derive.bcongr iota.
-(* Elpi derive.bcongr large. *)
+(*
+Elpi derive.bcongr large.
+*)
 Elpi derive.bcongr prim_int.
 Elpi derive.bcongr prim_float.
 Elpi derive.bcongr fo_record.
@@ -31,6 +33,11 @@ Elpi derive.bcongr pa_record.
 Elpi derive.bcongr pr_record.
 Fail Elpi derive.bcongr dep_record.
 Elpi derive.bcongr enum.
+Elpi derive.bcongr eq.
+Elpi derive.bcongr bool.
+Fail Elpi derive.bcongr sigma_bool.
+Fail Elpi derive.bcongr val.
+Fail Elpi derive.bcongr ord.
 End Coverage.
 
 Import Coverage.

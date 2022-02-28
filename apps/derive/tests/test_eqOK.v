@@ -27,7 +27,9 @@ Fail Elpi derive.eqOK dyn.
 Elpi derive.eqOK zeta.
 Elpi derive.eqOK beta.
 Fail Elpi derive.eqOK iota.
-(* Elpi derive.eqOK large. *)
+(*
+Elpi derive.eqOK large.
+*)
 Elpi derive.eqOK prim_int.
 Fail Elpi derive.eqOK prim_float.
 Elpi derive.eqOK fo_record.
@@ -35,6 +37,11 @@ Elpi derive.eqOK pa_record.
 Elpi derive.eqOK pr_record.
 Fail Elpi derive.eqOK dep_record.
 Elpi derive.eqOK enum.
+Elpi derive.eqOK bool.
+Fail Elpi derive.eqOK eq.
+Fail Elpi derive.eqOK sigma_bool.
+Fail Elpi derive.eqOK val.
+Fail Elpi derive.eqOK ord.
 End Coverage.
 
 Import Coverage.

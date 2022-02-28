@@ -4,7 +4,6 @@ From elpi.apps.derive.tests Require Import test_derive_stdlib test_tag.
 Import test_derive_stdlib.Coverage test_tag.Coverage.
 
 Module Coverage.
-
 Elpi derive.fields empty.
 Elpi derive.fields unit.
 Elpi derive.fields peano.
@@ -22,7 +21,7 @@ Elpi derive.fields dyn.
 Fail Elpi derive.fields zeta.
 Elpi derive.fields beta.
 Fail Elpi derive.fields iota.
-Time Elpi derive.fields large.
+Elpi derive.fields large.
 Elpi derive.fields prim_int.
 Elpi derive.fields prim_float.
 Elpi derive.fields fo_record.
@@ -30,6 +29,8 @@ Elpi derive.fields pa_record.
 Fail Elpi derive.fields pr_record. (* fixme elaborate *)
 Elpi derive.fields dep_record.
 Elpi derive.fields enum.
+Elpi derive.fields bool.
+Fail Elpi derive.fields eq.
 Elpi derive.fields sigma_bool.
 Elpi derive.fields ord.
 Elpi derive.fields val.

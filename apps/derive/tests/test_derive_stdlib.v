@@ -102,4 +102,9 @@ Inductive ord (p : peano) := mkOrd (n : peano) (l : is_leq n p = true).
 
 Inductive val := V (p : peano) (o : ord p).
 
+(* to make the coverage cound correct
+Inductive eq := ...
+Inductive bool := ...
+we don't have a copy here because some DBs have special rules*)
+
 End Coverage.

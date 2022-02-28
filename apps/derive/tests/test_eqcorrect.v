@@ -29,7 +29,9 @@ Fail Elpi derive.eqcorrect dyn.
 Elpi derive.eqcorrect zeta.
 Elpi derive.eqcorrect beta.
 Fail Elpi derive.eqcorrect iota.
-(* Elpi derive.eqcorrect large. *)
+(*
+Elpi derive.eqcorrect large.
+*)
 Elpi derive.eqcorrect prim_int.
 Fail Elpi derive.eqcorrect prim_float.
 Elpi derive.eqcorrect fo_record.
@@ -37,6 +39,11 @@ Elpi derive.eqcorrect pa_record.
 Elpi derive.eqcorrect pr_record.
 Fail Elpi derive.eqcorrect dep_record.
 Elpi derive.eqcorrect enum.
+Fail Elpi derive.eqcorrect eq.
+Elpi derive.eqcorrect bool.
+Fail Elpi derive.eqcorrect sigma_bool.
+Fail Elpi derive.eqcorrect ord.
+Fail Elpi derive.eqcorrect val.
 End Coverage.
 
 Import Coverage.

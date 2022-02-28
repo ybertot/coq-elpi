@@ -32,6 +32,9 @@ Elpi derive.param1.functor is_pa_record.
 Elpi derive.param1.functor is_pr_record.
 Elpi derive.param1.functor is_dep_record.
 Elpi derive.param1.functor is_enum.
+Fail Elpi derive.param1.functor is_eq.
+Elpi derive.param1.functor is_bool.
+Elpi derive.param1.functor is_sigma_bool.
 Fail Elpi derive.param1.functor is_ord.
 Elpi derive.param1.functor is_val.
 

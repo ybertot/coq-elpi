@@ -22,10 +22,9 @@ Fail Elpi derive.eqb dyn.
 Fail Elpi derive.eqb zeta.
 Elpi derive.eqb beta.
 Fail Elpi derive.eqb iota.
-(* Elpi derive.eqb large. *)
-(* TODO move this else where *)
-(*Elpi Accumulate derive.eqb.db lp:{{eqb-for {{PrimInt63.int}} {{PrimInt63.eqb}}. }}.
-Elpi Accumulate derive.eqb.db lp:{{eqb-for {{PrimFloat.float}} {{PrimFloat.eqb}}. }}. *)
+(* slow
+Elpi derive.eqb large.
+*)
 Elpi derive.eqb prim_int.
 Elpi derive.eqb prim_float.
 Elpi derive.eqb fo_record.
@@ -33,6 +32,8 @@ Elpi derive.eqb pa_record.
 Fail Elpi derive.eqb pr_record. (* fixme elaborate *)
 Elpi derive.eqb dep_record.
 Elpi derive.eqb enum.
+Fail Elpi derive.eqb eq.
+Elpi derive.eqb bool.
 Elpi derive.eqb sigma_bool.
 Elpi derive.eqb ord.
 Elpi derive.eqb val.

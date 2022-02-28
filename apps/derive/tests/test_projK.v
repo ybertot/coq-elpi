@@ -29,6 +29,11 @@ Elpi derive.projK pa_record.
 Elpi derive.projK pr_record.
 Elpi derive.projK dep_record.
 Elpi derive.projK enum.
+Elpi derive.projK eq.
+Elpi derive.projK bool.
+Elpi derive.projK sigma_bool.
+Elpi derive.projK ord.
+Elpi derive.projK val.
 End Coverage.
 
 Import Coverage.

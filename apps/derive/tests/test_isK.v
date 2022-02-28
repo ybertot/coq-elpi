@@ -29,6 +29,11 @@ Elpi derive.isK pa_record.
 Elpi derive.isK pr_record.
 Elpi derive.isK dep_record.
 Elpi derive.isK enum.
+Elpi derive.isK bool.
+Elpi derive.isK eq.
+Elpi derive.isK sigma_bool.
+Elpi derive.isK ord.
+Elpi derive.isK val.
 End Coverage.
 
 Import Coverage.
