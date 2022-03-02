@@ -37,7 +37,6 @@ Elpi derive.param1.congr is_eq.
 Elpi derive.param1.congr is_sigma_bool.
 Elpi derive.param1.congr is_ord.
 Elpi derive.param1.congr is_val.
-
 End Coverage.
 
 Import Coverage.

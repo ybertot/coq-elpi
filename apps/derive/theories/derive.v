@@ -53,7 +53,6 @@ From elpi.apps Require Export
   derive.projK
   derive.param1
   derive.param1_congr
-  derive.param1_inhab
   derive.param1_trivial
   derive.invert
   derive.idx2inv
@@ -97,10 +96,8 @@ Elpi Accumulate File "param1_functor.elpi" From elpi.apps.derive.
 Elpi Accumulate Db derive.param1.congr.db.
 Elpi Accumulate File "param1_congr.elpi" From elpi.apps.derive.
 
-Elpi Accumulate Db derive.param1.inhab.db.
-Elpi Accumulate File "param1_inhab.elpi" From elpi.apps.derive.
-
 Elpi Accumulate Db derive.param1.trivial.db.
+Elpi Accumulate File "param1_inhab.elpi" From elpi.apps.derive.
 Elpi Accumulate File "param1_trivial.elpi" From elpi.apps.derive.
 
 Elpi Accumulate Db derive.invert.db.

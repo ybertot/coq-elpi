@@ -1,6 +1,6 @@
 From Coq Require Import ssreflect ssrfun ssrbool Eqdep_dec.
 From elpi Require Import elpi.
-From elpi.apps.derive Require Import induction param1_functor param1_inhab eqb_core_defs tag fields eqb.
+From elpi.apps.derive Require Import induction param1_functor param1_trivial eqb_core_defs tag fields eqb.
 
 Export ssreflect ssrbool eqb_core_defs. (* go ask the ltac gurus... *)
 Ltac eqb_correct_on__solver :=
@@ -22,7 +22,7 @@ Elpi Accumulate Db derive.eqb.db.
 Elpi Accumulate Db derive.fields.db.
 Elpi Accumulate Db derive.eqbcorrect.db.
 Elpi Accumulate Db derive.induction.db.
-Elpi Accumulate Db derive.param1.inhab.db.
+Elpi Accumulate Db derive.param1.trivial.db.
 Elpi Accumulate Db derive.param1.functor.db. 
 Elpi Accumulate File "eqbcorrect.elpi" From elpi.apps.derive.
 Elpi Accumulate File "paramX-lib.elpi" From elpi.apps.derive. 

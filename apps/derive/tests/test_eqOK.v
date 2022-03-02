@@ -1,12 +1,11 @@
 From elpi.apps Require Import derive.eqOK.
 
-From elpi.apps Require Import test_derive_stdlib test_eqcorrect test_param1 test_param1_inhab test_param1_trivial.
+From elpi.apps Require Import test_derive_stdlib test_eqcorrect test_param1 test_param1_trivial.
 
 Import test_derive_stdlib.Coverage.
 Import tests.test_eq.Coverage.
 Import test_eqcorrect.Coverage.
 Import test_param1.Coverage.
-Import test_param1_inhab.Coverage.
 Import test_param1_trivial.Coverage.
 
 Module Coverage.
@@ -80,7 +79,8 @@ Import test_param1_functor.Coverage.
 Inductive dlist A := dnil | dcons (a : pair A peano) (l : dlist A).
 
 Elpi derive.param1 dlist.
-Elpi derive.param1.inhab is_dlist.
+Elpi derive.param1.congr is_dlist.
+Elpi derive.param1.trivial is_dlist.
 Elpi derive.induction dlist.
 Elpi derive.projK dlist.
 Elpi derive.bcongr dlist.

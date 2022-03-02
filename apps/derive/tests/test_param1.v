@@ -30,7 +30,9 @@ Elpi derive.param1 pa_record.
 Elpi derive.param1 pr_record.
 Elpi derive.param1 dep_record.
 Elpi derive.param1 enum.
-Elpi derive.param1 eq.
+(*
+Elpi derive.param1 eq. (* done in param1.v *)
+*)
 Elpi derive.param1 bool.
 Elpi derive.param1 is_zero.
 Elpi derive.param1 sigma_bool.
