@@ -24,7 +24,9 @@ Elpi derive.param1.congr is_dyn.
 Elpi derive.param1.congr is_zeta.
 Elpi derive.param1.congr is_beta.
 Elpi derive.param1.congr is_iota.
-(* Elpi derive.param1.congr is_large. *)
+(*
+Elpi derive.param1.congr is_large. (* slow *)
+*)
 Elpi derive.param1.congr is_prim_int.
 Elpi derive.param1.congr is_prim_float.
 Elpi derive.param1.congr is_fo_record.
