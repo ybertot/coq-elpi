@@ -29,7 +29,7 @@ Elpi derive.eqb prim_int.
 Elpi derive.eqb prim_float.
 Elpi derive.eqb fo_record.
 Elpi derive.eqb pa_record.
-Fail Elpi derive.eqb pr_record. (* fixme elaborate *)
+Elpi derive.eqb pr_record.
 Elpi derive.eqb dep_record.
 Elpi derive.eqb enum.
 Fail Elpi derive.eqb eq.
@@ -65,7 +65,7 @@ Check prim_float_eqb    : eq_test prim_float.
 Check fo_record_eqb : eq_test fo_record.
 
 Check pa_record_eqb : forall A, eq_test A -> eq_test (pa_record A).
-Fail Check pr_record_eqb : forall A, eq_test A -> eq_test (pr_record A).
+Check pr_record_eqb : forall A, eq_test A -> eq_test (pr_record A).
 Check enum_eqb : eq_test enum.
 Check sigma_bool_eqb : eq_test sigma_bool.
 Check ord_eqb : forall p, eq_test (ord p).

@@ -8,16 +8,16 @@ main I Prefix CL :- std.do! [
   Ind = global (indt I),
 
   % the non recursive code comparing all fields according to their types
-  derive.eqbf.do-params N Arity Ind R,
-  std.assert-ok! (coq.typecheck R Rty) "derive.eqbf generates illtyped term",
+  derive.eqbf.do-params N Arity Ind RSkel,
+  std.assert-ok! (coq.elaborate-skeleton RSkel Rty R) "derive.eqbf generates illtyped term",
   Name is Prefix ^ "eqb_fields",
   coq.env.add-const Name R Rty ff C,
   EQBF = global (const C),
   
   % the fix
 
-  do-params N Arity Ind EQBF R1,
-  std.assert-ok! (coq.typecheck R1 R1ty) "derive.eqb generates illtyped term",
+  do-params N Arity Ind EQBF R1Skel,
+  std.assert-ok! (coq.elaborate-skeleton R1Skel R1ty R1) "derive.eqb generates illtyped term",
   Name1 is Prefix ^ "eqb",
   coq.env.add-const Name1 R1 R1ty ff C1,
   EQB = global (const C1),
@@ -29,16 +29,12 @@ main I Prefix CL :- std.do! [
   std.forall CL (x\ coq.elpi.accumulate _ "derive.eqb.db" (clause _ _ x)),
 ].
 
-pred is-a-type i:term.
-is-a-type (sort (typ _)).
-is-a-type (sort prop) :- coq.error "derive.eqb: parameters in Prop are not supported".
-is-a-type T :- whd1 T T1, !, is-a-type T1.
-
 pred do-params i:int, i:term, i:term, i:term, o:term.
-do-params N {{ forall x : lp:T, lp:(F x) }} I EF {{ fun (x : lp:T) (eqx : x -> x -> bool) => lp:(R x eqx) }}  :- N > 0, is-a-type T, !, M is N - 1,
+do-params N {{ forall x : lp:T, lp:(F x) }} I EF {{ fun (x : lp:T) (eqx : x -> x -> bool) => lp:(R x eqx) }}  :- N > 0, coq.informative-sort? T, !, M is N - 1,
   @pi-decl `x` T x\
   @pi-decl `eqx` {{ lp:x -> lp:x -> bool }} eqx\
     do-params M (F x) {coq.mk-app I [x]} {coq.mk-app EF [x,eqx]} (R x eqx).
+do-params N {{ forall x : lp:T, _ }} _ _ _ :- N > 0, coq.sort? T, coq.error "derive.eqb: parameters in Prop not supported".
 do-params N {{ forall x : lp:T, lp:(F x) }} I EF {{ fun (x : lp:T) => lp:(R x) }}  :- N > 0, !, M is N - 1,
   @pi-decl `x` T x\
     do-params M (F x) {coq.mk-app I [x]} {coq.mk-app EF [x]} (R x).
@@ -67,7 +63,7 @@ do-match X1 I X2 F R :-
 pred do-branch i:term, i:term, i:term, i:term, i:list term, i:list term, o:term.
 do-branch X2 F K KTY Vars VarsT {{ @eqb_core_defs.eqb_body _ _ _ lp:FLDP lp:F lp:TAG lp:X lp:X2 }} :- std.do! [
   coq.safe-dest-app KTY (global (indt I)) Params,
-  fields-for I _ FLD _ _,
+  std.assert! (fields-for I _ FLD _ _) "derive.eqb: run derive.fields before",
   tag-for I T,
   coq.mk-app (global (const FLD)) Params FLDP,
   coq.mk-app (global (const T)) Params TA,
@@ -86,9 +82,10 @@ to-tuple [X|XS] [_T|TS] {{ ( lp:X, lp:R ) }} :-
 
 % example: eqb-for {{ list lp:A }} {{ @list_eqb lp:A lp:F }} :- eqb-for A F.
 pred do-clause i:int, i:term, i:term, i:term, i:list prop, o:prop.
-do-clause N {{ forall p : lp:T, lp:(A p) }} I F Todo (pi a ea\ C a ea) :- N > 0, is-a-type T, !, M is N - 1,
+do-clause N {{ forall p : lp:T, lp:(A p) }} I F Todo (pi a ea\ C a ea) :- N > 0, coq.informative-sort? T, !, M is N - 1,
   pi a ea\
     do-clause M (A a) {coq.mk-app I [a]} {coq.mk-app F [a,ea]} [eqb-for a ea|Todo] (C a ea).
+do-clause N {{ forall x : lp:T, _ }} _ _ _ _ :- N > 0, coq.sort? T, coq.error "derive.eqb: parameters in Prop not supported".
 do-clause N {{ forall p, lp:(A p) }} I F Todo (pi a\ C a) :- N > 0, !, M is N - 1,
   pi a\
     do-clause M (A a) {coq.mk-app I [a]} {coq.mk-app F [a]} Todo (C a).
@@ -101,11 +98,12 @@ do-clause 0 _ I F Todo (eqb-for I F :- Todo).
 namespace derive.eqbf {
   
 pred do-params i:int, i:term, i:term, o:term.
-do-params J {{ forall p : lp:T, lp:(F p) }} I {{ fun (p : lp:T) (eqp : p -> p -> bool) => lp:(R p eqp) }} :- J > 0, derive.eqb.is-a-type T, !, K is J - 1,
+do-params J {{ forall p : lp:T, lp:(F p) }} I {{ fun (p : lp:T) (eqp : p -> p -> bool) => lp:(R p eqp) }} :- J > 0, coq.informative-sort? T, !, K is J - 1,
   @pi-decl `P` T p\
   @pi-decl `eqP` {{ lp:p -> lp:p -> bool }} eqP\
     eqb-for p eqP =>
     do-params K (F p) {coq.mk-app I [p]} (R p eqP).
+do-params J {{ forall x : lp:T, _ }} _ _ :- J > 0, coq.sort? T, coq.error "derive.eqb: parameters in Prop not supported".
 
 do-params J {{ forall p : lp:T, lp:(F p) }} I {{ fun (p : lp:T) => lp:(R p) }} :- J > 0, !, K is J - 1,
   @pi-decl `P` T p\
@@ -115,7 +113,7 @@ do-params 0 _ Ind {{ fun (rec : lp:Ind -> lp:Ind -> bool) (x : positive) => lp:(
   coq.safe-dest-app Ind (global (indt I)) Params,
   coq.env.indt I _ _ _ _ _ KT,
   std.map KT (coq.subst-prod Params) L,
-  fields-for I F_t _ _ _,
+  std.assert! (fields-for I F_t _ _ _) "derive.eqb: run derive.fields before",
   coq.mk-app (global (const F_t)) Params Fields_t,
   (@pi-decl `rec` {{ lp:Ind -> lp:Ind -> bool }} rec\
    @pi-decl `x` {{ positive }} x\
@@ -159,9 +157,10 @@ do-fields.aux _T _ _ {{ true }}. % :- coq.error "no comparison for" T.
 %      eqb-for A EA, eqb-for {{ list lp:A }} ELA.
 
 pred do-clause i:int, i:term, i:term, i:term, i:list prop, o:prop.
-do-clause N (prod _ T A) I F Todo (pi a ea\ C a ea) :- N > 0, derive.eqb.is-a-type T, !, M is N - 1,
+do-clause N (prod _ T A) I F Todo (pi a ea\ C a ea) :- N > 0, coq.informative-sort? T, !, M is N - 1,
   pi a ea\
     do-clause M (A a) {coq.mk-app I [a]} {coq.mk-app F [a,ea]} [eqb-for a ea|Todo] (C a ea).
+do-clause _ (prod _ T _) _ _ _ _ :- coq.sort? T, coq.error "derive.eqb: parameters in Prop are not supported".
 
 do-clause N (prod _ _ A) I F Todo (pi a\ C a) :- N > 0, !, M is N - 1,
   pi a \

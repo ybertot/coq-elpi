@@ -26,7 +26,7 @@ Elpi derive.fields prim_int.
 Elpi derive.fields prim_float.
 Elpi derive.fields fo_record.
 Elpi derive.fields pa_record.
-Fail Elpi derive.fields pr_record. (* fixme elaborate *)
+Elpi derive.fields pr_record.
 Elpi derive.fields dep_record.
 Elpi derive.fields enum.
 Elpi derive.fields bool.
@@ -129,10 +129,10 @@ Check pa_record_fields : forall (A:Type) (l:pa_record A), pa_record_fields_t A (
 Check pa_record_construct : forall (A:Type) (p: Numbers.BinNums.positive),  pa_record_fields_t A p -> Datatypes.option (pa_record A).
 Check pa_record_constructP : forall (A:Type) (l:pa_record A), pa_record_construct A (pa_record_tag A l) (pa_record_fields A l) = Datatypes.Some l.
 
-Fail Check pr_record_fields_t : Type -> Numbers.BinNums.positive -> Type. 
-Fail Check pr_record_fields : forall (A:Type) (l:pr_record A), pr_record_fields_t A (pr_record_tag A l). 
-Fail Check pr_record_construct : forall (A:Type) (p: Numbers.BinNums.positive),  pr_record_fields_t A p -> Datatypes.option (pr_record A).
-Fail Check pr_record_constructP : forall (A:Type) (l:pr_record A), pr_record_construct A (pr_record_tag A l) (pr_record_fields A l) = Datatypes.Some l.
+Check pr_record_fields_t : Type -> Numbers.BinNums.positive -> Type. 
+Check pr_record_fields : forall (A:Type) (l:pr_record A), pr_record_fields_t A (pr_record_tag A l). 
+Check pr_record_construct : forall (A:Type) (p: Numbers.BinNums.positive),  pr_record_fields_t A p -> Datatypes.option (pr_record A).
+Check pr_record_constructP : forall (A:Type) (l:pr_record A), pr_record_construct A (pr_record_tag A l) (pr_record_fields A l) = Datatypes.Some l.
 
 Check sigma_bool_fields_t :  Numbers.BinNums.positive -> Type. 
 Check sigma_bool_fields : forall (l:sigma_bool), sigma_bool_fields_t (sigma_bool_tag l). 

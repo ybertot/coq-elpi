@@ -10,11 +10,11 @@ main I Prefix CLs :- std.do! [
   mk-reali (global (indt I)) IR, % param1-db, really
  
   /* Correctness */
-coq.say "0" I,
+%coq.say "0" I,
   std.map2 KTs Ks (add-decl-correct Prefix N (global (indt I))) Lt-correct,
-coq.say "1",
+%coq.say "1",
   add-indu-correct TI (global (indt I)) Indu IR Lt-correct R,
-coq.say "2",
+%coq.say "2",
 
   std.assert-ok! (coq.typecheck R Ty) "derive.eqbcorrect: add-indu-correct generates ill typed term", 
   %coq.say "R =" {coq.term->string R}, 
@@ -127,7 +127,7 @@ add-decl-correct _Prefix N I KT K R /*(global (const P))*/ :- std.do![
 
 pred mk-reali i:term, o:term.
 mk-reali T R :- !,
-  coq.say "REALI" {coq.term->string T},
+  % coq.say "REALI" {coq.term->string T},
   std.assert! (reali T R) {calc (
     "derive.eqbcorrect: no unary parametricity translation for " ^ {coq.term->string T} ^ ", use derive.param1 first")}.
 

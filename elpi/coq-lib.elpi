@@ -436,11 +436,14 @@ coq.term->gref Term _ :-
 
 pred coq.fresh-type o:term.
 coq.fresh-type (sort (typ U)) :- coq.univ.new [] U.
-pred is-sort i:term.
 
 pred coq.sort? i:term.
 coq.sort? (sort _).
 coq.sort? T :- whd1 T T1, coq.sort? T1.
+
+pred coq.informative-sort? i:term.
+coq.informative-sort? (sort (typ _)).
+coq.informative-sort? T :- whd1 T T1, coq.informative-sort? T1.
 
 % Map the term under a spine of fun nodes
 pred coq.map-under-fun i:term,

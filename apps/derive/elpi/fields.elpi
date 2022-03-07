@@ -14,8 +14,8 @@ main I Prefix CL :- std.do! [
   coq.env.add-const Name_t Body_t Ty_t ff Fields_t, 
 
   coq.env.indt I _ _ _ Arity _ _,
-  coq.bind-ind-arity (global (indt I)) Arity (repack-as-tuple Fields_t Tag) Body,
-  std.assert-ok! (coq.typecheck Body Ty) "derive.fields generates illtyped fields",
+  coq.bind-ind-arity (global (indt I)) Arity (repack-as-tuple Fields_t Tag) BodySkel,
+  std.assert-ok! (coq.elaborate-skeleton BodySkel Ty Body) "derive.fields generates illtyped fields",
   Name is Prefix ^ "fields",
   coq.env.add-const Name Body Ty ff Fields, 
 
@@ -24,8 +24,8 @@ main I Prefix CL :- std.do! [
   Name_c is Prefix ^ "construct",
   coq.env.add-const Name_c Body_c Ty_c ff Construct, 
 
-  coq.bind-ind-arity (global (indt I)) Arity (case-refl Tag Fields Construct) Body_P,
-  std.assert-ok! (coq.typecheck Body_P Ty_P) "derive.fields generates illtyped constructP",
+  coq.bind-ind-arity (global (indt I)) Arity (case-refl Tag Fields Construct) Body_PSkel,
+  std.assert-ok! (coq.elaborate-skeleton Body_PSkel Ty_P Body_P) "derive.fields generates illtyped constructP",
   Name_P is Prefix ^ "constructP",
   coq.env.add-const Name_P Body_P Ty_P @opaque! ConstructP, 
 
