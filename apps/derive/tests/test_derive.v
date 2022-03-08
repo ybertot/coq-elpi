@@ -23,7 +23,7 @@ Elpi derive Coverage.iota.
 Elpi derive Coverage.prim_int.
 Elpi derive Coverage.fo_record.
 Elpi derive Coverage.pa_record.
-Fail Elpi derive Coverage.pr_record.
+Elpi derive Coverage.pr_record.
 Elpi derive Coverage.dep_record.
 Elpi derive Coverage.enum.
 

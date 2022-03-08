@@ -59,7 +59,7 @@ Fail Elpi derive.eqbcorrect prim_float. (* Can not work, we don't have a syntaxt
 
 Elpi derive.eqbcorrect fo_record.
 Elpi derive.eqbcorrect pa_record.
-Fail Elpi derive.eqbcorrect pr_record.   
+Elpi derive.eqbcorrect pr_record.   
 Fail Elpi derive.eqbcorrect dep_record.
 Elpi derive.eqbcorrect enum.
 Fail Elpi derive.eqbcorrect eq.
