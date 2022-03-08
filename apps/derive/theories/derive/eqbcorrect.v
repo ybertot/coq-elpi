@@ -3,18 +3,31 @@ From elpi Require Import elpi.
 From elpi.apps.derive Require Import induction param1_functor param1_trivial eqb_core_defs tag fields eqb.
 
 Export ssreflect ssrbool eqb_core_defs. (* go ask the ltac gurus... *)
+Ltac do_one_arg x :=
+  let t := type of x in
+  match reverse goal with 
+  | View : @eqb_correct_on _ _ _ |- _ =>
+      move=> /=/View{View} ?;
+      subst x
+  | x' : t |- Datatypes.is_true true -> _ =>
+      move=> _;
+      rewrite (@Eqdep_dec.UIP_dec bool Bool.bool_dec _ _ x x')
+  end.
+
 Ltac eqb_correct_on__solver :=
-  by repeat (
-    try case/andP; 
-    match reverse goal with 
-    | H : @eqb_correct_on _ _ _ |- _ => move=> /=/H{H}->
-    end (*;
-    f_equal => //; apply (@UIP_dec bool Bool.bool_dec) *)
-  ).
+  by match goal with
+  | f : _ |- _ => move: f
+  end;
+  repeat (
+    let f := fresh "f" in
+    let x := fresh "x" in
+    move=> f;
+    ((case/andP; case: f => x f; do_one_arg x; move: f)
+    || (do_one_arg f))).
 
 Ltac eqb_refl_on__solver :=
-  rewrite /eqb_fields_refl_on /=;
-  by repeat (reflexivity || apply/andP; split; assumption).
+  by rewrite /eqb_fields_refl_on /=;
+  repeat ((apply /andP; split) || reflexivity || assumption).
       
 Elpi Command derive.eqbcorrect.
 Elpi Accumulate Db derive.tag.db.
