@@ -10,46 +10,6 @@ Module Coverage.
 Elpi derive.param1.trivial is_empty.
 Elpi derive.param1.trivial is_unit.
 Elpi derive.param1.trivial is_peano.
-(*
-Print congr_is_Succ.
-Print is_peano_witness.
-Print is_peano_trivial.
-Definition is_peano_trivial2 : forall x : peano, {u : is_peano x & forall v : is_peano x, u = v}.
-refine (fun x : peano => contracts peano is_peano x (is_peano_witness x) _).
-revert x. fix rec 2.
-intros x px. case px.
-  reflexivity.
-  intros n pn.
-  simpl.
-fun x : peano =>
-contracts peano is_peano x (is_peano_witness x)
-  ((fix IH (x0 : peano) (y : is_peano x0) {struct y} :
-	    is_peano_witness x0 = y :=
-      match y as i in (is_peano s1) return (is_peano_witness s1 = i) with
-      | is_Zero => eq_refl
-      | is_Succ n Pn => 
-           congr_is_Succ n (is_peano_witness n) Pn
-           (trivial_uniq peano is_peano
-              (fun x1 : peano =>
-               contracts peano is_peano x1 (is_peano_witness x1) (IH x1)) n
-              Pn)
-      (*eq_refl*) (*
-          match
-            trivial_uniq peano is_peano
-              (fun x1 : peano =>
-               contracts peano is_peano x1 (is_peano_witness x1) (IH x1)) n
-              Pn in (_ = H)
-            return
-              (is_Succ n
-                 (trivial_full peano is_peano
-                    (fun x1 : peano =>
-                     contracts peano is_peano x1 (is_peano_witness x1)
-                       (IH x1)) n) = is_Succ n H)
-          with
-          | eq_refl => eq_refl
-          end*)
-      end) x).
-*)
 Elpi derive.param1.trivial is_option.
 Elpi derive.param1.trivial is_pair.
 Elpi derive.param1.trivial is_seq.
@@ -59,61 +19,6 @@ Elpi derive.param1.trivial is_rose.
 Elpi derive.param1.trivial is_rose_p.
 Elpi derive.param1.trivial is_rose_o.
 Fail Elpi derive.param1.trivial is_w.
-(*
-Lemma is_vect_witness A (PA : A -> Type) (HA : full A PA) (i : peano) (pi: is_peano i) :
-  forall (v : vect A i), is_vect A PA i pi v.
-(*rewrite <- (trivial_uniq _ _ is_peano_trivial i pi). clear pi.*)
-revert i pi.
-fix rec 3.
-intros i pi v.
-  rewrite <- (trivial_uniq _ _ is_peano_trivial2 i pi). clear pi.
-  case v.
-  constructor 1.
-intros x j xs.
-  constructor 2.
-  apply HA.
-  apply rec.
-Defined.
-
-Lemma is_vect_trivial A (PA : A -> Type) (HA : trivial A PA) :
-forall (i : peano) (pi: is_peano i), trivial (vect A i) (is_vect A PA i pi).
-Proof.
-    intros i pi v.
-    apply (contracts _ (is_vect A PA i pi) v (is_vect_witness A PA (trivial_full _ _ HA) i pi v)). 
-    (*rewrite <- (trivial_uniq _ _ is_peano_trivial i pi). clear pi.*)
-    revert i pi v.
-    fix rec 4.
-    intros i is_i v is_v.
-    case is_v.
-      reflexivity.
-    intros a is_a j is_j t is_t.
-    case (rec j is_j t is_t).
-    rewrite <- (trivial_uniq _ _ is_peano_trivial2 j is_j).
-    rewrite <- (trivial_uniq _ _ HA a is_a).
-    simpl.
-    assert (forall x, x = 
-    (trivial_uniq peano is_peano is_peano_trivial2 (Succ j)
-     (is_Succ j (trivial_full peano is_peano is_peano_trivial2 j)))
-    ).
-
-intro.
-unfold trivial_uniq, trivial_full, is_peano_trivial2. simpl.
-
-    unfold is_peano_trivial.
-    case (trivial_uniq peano is_peano is_peano_trivial (Succ j) (is_Succ j (trivial_full peano is_peano is_peano_trivial j))).
-    reflexivity.
-
-
-
-    unfold is_vect_witness. unfold trivial_uniq. unfold is_peano_trivial. simpl.
-    reflexivity.
-    case
-
-    Check (contracts _ _ (is_vect_witness A PA (trivial_full _ _ HA))).
-
-
-
-*)
 Fail Elpi derive.param1.trivial is_vect.
 Fail Elpi derive.param1.trivial is_dyn.
 Elpi derive.param1.trivial is_zeta.

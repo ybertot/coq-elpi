@@ -1,5 +1,5 @@
 From elpi.apps Require Import derive.eqbcorrect.
-
+From elpi.apps.derive Require Import param1. (* FIXME, the clause is in param1 *)
 From elpi.apps.derive.tests Require Import test_derive_stdlib test_tag test_fields test_eqb test_induction 
                                            test_param1 test_param1_trivial test_param1_functor.
 Import test_derive_stdlib.Coverage 
@@ -64,8 +64,88 @@ Fail Elpi derive.eqbcorrect dep_record.
 Elpi derive.eqbcorrect enum.
 Fail Elpi derive.eqbcorrect eq.
 Elpi derive.eqbcorrect bool.
-Fail Elpi derive.eqbcorrect sigma_bool. (* A lot is missing for this one *)
-Fail Elpi derive.eqbcorrect ord.
+Fail Elpi derive.eqbcorrect sigma_bool.
+Print ord_eqb_fields.
+Elpi Print derive.eqbcorrect.
+
+Print ord_induction.
+Lemma foo (p : peano)
+(q : peano)
+(elpi_ctx_entry_9_ : is_peano q)
+(Hq : eqb_correct_on peano_eqb q := (fun (x : peano) elpi_ctx_entry_16_ =>
+ peano_eqb_correct_aux x elpi_ctx_entry_16_) q
+  elpi_ctx_entry_9_)
+(Hle : is_leq q p = true)
+(elpi_ctx_entry_12_ : is_eq bool is_bool (is_leq q p)
+  (is_is_leq q elpi_ctx_entry_9_ p
+     (is_peano_witness p)) true is_true Hle)
+(HHle : (fun _ => True) Hle := (fun x _ => I) Hle elpi_ctx_entry_12_)
+(f : ord_fields_t p
+  (ord_tag p
+     (mkOrd p q Hle)))
+ :
+ord_eqb_fields p (ord_eqb p)
+  (ord_tag p
+     (mkOrd p q Hle))
+  (ord_fields p
+     (mkOrd p q Hle)) f ->
+Datatypes.Some (mkOrd p q Hle) =
+ord_construct p
+  (ord_tag p
+     (mkOrd p q Hle)) f.
+
+    revert f.
+
+
+    repeat ((let f := fresh "f" in
+    ((move=> f; case/andP; case: f => ? f) || (move=> f));
+    match reverse goal with 
+    | View : @eqb_correct_on _ _ ?x |- _ =>
+        move=> /=/View{View} ?;
+        subst x
+    | _ => move=> (* /UIP -> *)   
+    end; revert f));
+    repeat f_equal=>//.
+    f_equal=>//;
+    try apply (@Eqdep_dec.UIP_dec bool Bool.bool_dec);
+    revert f)).
+
+
+    repeat ((let f := fresh "f" in
+            ((case=> ? f; case/andP) || (move=> f));
+            match reverse goal with 
+            | View : @eqb_correct_on _ _ ?x |- _ =>
+                move=> /=/View{View} H;
+                subst x
+            | _ => move=> _    
+            end;
+            f_equal=>//;
+            f_equal=>//;
+            try apply (@Eqdep_dec.UIP_dec bool Bool.bool_dec);
+            revert f)).
+    
+            
+    repeat (case=> ? f; case/andP;
+    
+    => /=/Hq HH; ; revert f).
+
+     case: f => ? f; case/andP => /=/Hq HH; subst q.
+
+     case/andP.
+     move=> /=/Hq H. move: f. <-.
+     
+     case: f. move=> /= x px ?; subst q. idtac.
+     move=> _.
+     f_equal => //.
+     f_equal => //.
+     apply (@Eqdep_dec.UIP_dec bool Bool.bool_dec).
+
+
+     subst q.
+     {Hq}->.
+eqb_correct_on__solver
+
+Elpi derive.eqbcorrect ord.
 Fail Elpi derive.eqbcorrect val.
 
 End Coverage.

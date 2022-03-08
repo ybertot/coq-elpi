@@ -10,14 +10,14 @@ main I Prefix CLs :- std.do! [
   mk-reali (global (indt I)) IR, % param1-db, really
  
   /* Correctness */
-%coq.say "0" I,
+coq.say "0" I,
   std.map2 KTs Ks (add-decl-correct Prefix N (global (indt I))) Lt-correct,
-%coq.say "1",
+coq.say "1",
   add-indu-correct TI (global (indt I)) Indu IR Lt-correct R,
-%coq.say "2",
+coq.say "2",
 
   std.assert-ok! (coq.typecheck R Ty) "derive.eqbcorrect: add-indu-correct generates ill typed term", 
-  %coq.say "R =" {coq.term->string R}, 
+  coq.say "R =" {coq.term->string R}, 
   Name is Prefix ^ "eqb_correct",
   coq.env.add-const Name R Ty @opaque! Correct,
  
@@ -54,7 +54,7 @@ main I Prefix CLs :- std.do! [
 pred run-solver i:sealed-goal, i:string.
 run-solver G Name :-
   if (coq.ltac.open (coq.ltac.call Name []) G []) true
-     (coq.sealed-goal->string G SG,
+     (@holes! => coq.sealed-goal->string G SG,
       std.fatal-error {calc ( "solver " ^ Name ^ " fails on goal:\n" ^ SG )}).
 
 pred coq.sealed-goal->string i:sealed-goal, o:string.
@@ -64,18 +64,22 @@ coq.sealed-goal->string (seal (goal Ctx _ Ty _ _)) R :-
 
 pred coq.ctx->string i:prop, o:string.
 coq.ctx->string (decl X _ Ty) R :- R is "(" ^ {coq.term->string X} ^ " : " ^ {coq.term->string Ty} ^ ")".
-coq.ctx->string (def X _ Ty B) R :- R is {coq.term->string X} ^ " : " ^ {coq.term->string Ty} ^ " := " ^ {coq.term->string B}.
+coq.ctx->string (def X _ Ty B) R :- R is "(" ^ {coq.term->string X} ^ " : " ^ {coq.term->string Ty} ^ " := " ^ {coq.term->string B} ^ ")".
 
 /************************** correct *********************************************/
 
 pred what-for i:(term -> term -> prop), i:(term -> term -> prop), i:term, o:term.
 
+% (is_option (seq A) (is_seq A (eqb_correrct A eqA) =>
+%  eqb_correrct (option (seq A)) 
 pred eqb-correct-aux-for i:term, o:term.
 
 eqb-correct-aux-for T R :-
   what-for correct-lemma-for eqb-correct-aux-for T R.
 
 eqb-correct-aux-for T R :- whd1 T T1, !, eqb-correct-aux-for T1 R.
+
+eqb-correct-aux-for {{ _ = true }} {{ fun x px => I }}.
 
 pred eqb-refl-aux-for i:term, o:term.
 eqb-refl-aux-for T R :- whd1 T T1, !, eqb-refl-aux-for T1 R.
@@ -157,8 +161,10 @@ do-params-correct NP I (prod N T F) K {{ fun (a : lp:T) (eqA : a -> a -> bool) =
     do-params-correct NP1 {coq.mk-app I [a]} (F a) {{ lp:K lp:a }} (R a eqA).
 
 do-params-correct NP I (prod N T F) K {{ fun (a : lp:T) => lp:(R a) }} :- NP > 0, !, NP1 is NP - 1,
+  reali T IsT,
+  std.spy(param1-inhab-db IsT IsT_inhab),
   @pi-decl N T a\
-    reali a {{ fun (a : lp:T) => True }} =>
+    reali a {{ lp:IsT_inhab lp:a }} =>
     do-params-correct NP1 {coq.mk-app I [a]} (F a) {{ lp:K lp:a }} (R a).
 
 /*
@@ -175,27 +181,46 @@ do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) (h : @eqb_cor
 ]. */
 
 pred do-args-correct i:term, i:term, o:term.
+
+do-args-correct (prod N ( {{ _ = true }} as T) F) K {{ fun (x : lp:T) (useless : lp:EqbOn x) => lp:(R x useless) }} :- !, std.do! [
+  mk-reali T EqbOn,
+  mk-eqb-for T Cmp, 
+  @pi-decl N T x\
+  @pi-decl `px` {{ lp:EqbOn lp:x }} px\
+  do-args-correct-body (F x) T EqbOn x px {{ fun _ => True }} {{ lp:K lp:x }} (R x px)
+]. 
+
 do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) => lp:(R x px) }} :- !, std.do! [
   mk-reali T EqbOn,
   mk-eqb-for T Cmp, 
   @pi-decl N T x\
   @pi-decl `px` {{ lp:EqbOn lp:x }} px\
+  reali x px =>
   do-args-correct-body (F x) T EqbOn x px {{ @eqb_correct_on lp:T lp:Cmp }} {{ lp:K lp:x }} (R x px)
 ]. 
 
+do-args-correct T K {{ lp:B : eqb_correct_on lp:Cmp lp:K }} :- std.do! [
+  mk-eqb-for T Cmp,
+  coq.safe-dest-app T (global (indt I)) Args,
+  fields-for I _ _ _ ConstructPC,
+  coq.mk-app (global (const ConstructPC)) Args ConstructP,
+  eqb-fields T Fields,
+  B = {{ @eqb_body_correct _ _ _ _ _ lp:ConstructP lp:Fields lp:K (fun f => _) }},
+  coq.typecheck {{ lp:B : eqb_correct_on lp:Cmp lp:K }} _ _,
+  coq.ltac.collect-goals B [G] _,
+  run-solver G "eqb_correct_on__solver",
+].
+
+% PX : _EqbOn X
+% View X PX : EqbOn' X
 pred do-args-correct-body i:term, i:term, i:term, i:term, i:term, i:term, i:term, o:term.
-do-args-correct-body F _T EqbOn _X _PX EqbOn' K R :- EqbOn = EqbOn', !, 
-/*  coq.say "EqbOn =" {coq.term->string EqbOn},
-    coq.say "EqbOn' =" {coq.term->string EqbOn'}, */
-  do-args-correct F K R.
-
-
-do-args-correct-body F T _EqbOn X PX EqbOn' K {{ let h : lp:EqbOn' lp:X := lp:View lp:X lp:PX in lp:(R h) }} :- !,
+do-args-correct-body F T _EqbOn X PX EqbOn' K {{ let h : lp:EqbOn' lp:X := lp:View lp:X lp:PX in lp:(R h) }} :- !, std.spy-do! [
 /*  coq.say "EqbOn =" {coq.term->string EqbOn},
    coq.say "EqbOn' =" {coq.term->string EqbOn'}, */
   eqb-correct-aux-for T View, 
   @pi-def `H` {{ lp:EqbOn' lp:X }} {{ lp:View lp:X lp:PX }} h\
-    do-args-correct F K  (R h).
+    do-args-correct F K  (R h)
+].
 
 
 
@@ -217,17 +242,6 @@ do-args-correct (prod N T F) K {{ fun (x : lp:T) (px : lp:EqbOn x) => lp:(Body x
 */
 
  
-do-args-correct T K {{ lp:B : eqb_correct_on lp:Cmp lp:K }} :- std.do! [
-  mk-eqb-for T Cmp,
-  coq.safe-dest-app T (global (indt I)) Args,
-  fields-for I _ _ _ ConstructPC,
-  coq.mk-app (global (const ConstructPC)) Args ConstructP,
-  eqb-fields T Fields,
-  B = {{ @eqb_body_correct _ _ _ _ _ lp:ConstructP lp:Fields lp:K (fun f => _) }},
-  coq.typecheck {{ lp:B : eqb_correct_on lp:Cmp lp:K }} _ _,
-  coq.ltac.collect-goals B [G] _,
-  run-solver G "eqb_correct_on__solver",
-].
 
 pred add-indu-correct i:term, i:term, i:term, i:term, i:list term, o:term.
 add-indu-correct (prod N T F) I Indu IR LS 
